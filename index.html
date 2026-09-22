@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="A nurturing learning environment from Nursery to Class 8. Explore our school, academics, admissions, and campus." />
+  <meta name="keywords" content="school, nursery, LKG, UKG, Class 1 to 8, admissions, education, Kashmir, modern school" />
+  <meta name="theme-color" content="#011959" />
+  <meta property="og:title" content="Genesis Global Academy, Budgam" />
+  <meta property="og:description" content="Where Learning Becomes Light. Nursery to Class 8." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="logo1.png" />
+  <meta property="og:url" content="https://genesisglobalacademy.org" />
+  <link rel="canonical" href="https://genesisglobalacademy.org" />
+  <!-- PWA -->
+<link rel="manifest" href="/manifest.json" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Genesis Global Academy" />
+<link rel="apple-touch-icon" href="icon-192x192.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="icon-96x96.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <!-- Firebase SDK v9 Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       TOP HEADER (compact brand bar)
+  ============================================================ -->
+  <header class="site-header" id="siteHeader" role="banner">
+    <div class="site-header-inner">
+      <a href="#home" class="site-header-brand" aria-label="Back to top">
+        <img src="logo2.png" alt="School Logo" class="site-header-logo" />
+        <div class="site-header-text">
+          <span class="site-header-title">Genesis Global Academy</span>
+          <span class="site-header-subtitle">
+            <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
+          </span>
+        </div>
+      </a>
+
+      <div class="site-header-actions">
+        <a href="#admissions" class="btn btn-crimson btn-header-cta">
+          <i class="bi bi-mortarboard-fill me-1"></i>
+          <span class="btn-header-cta-text">Apply for Admission</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       BOTTOM SECTION RAIL — always visible on ALL devices
+  ============================================================ -->
+  <nav class="section-rail" id="sectionRail" aria-label="Section navigator">
+    <div class="section-rail-inner">
+      <a href="#home" class="rail-tile active" data-target="home" aria-label="Home">
+        <span class="rail-icon"><i class="bi bi-house-door-fill"></i></span>
+        <span class="rail-name">Home</span>
+      </a>
+      <a href="#about" class="rail-tile" data-target="about" aria-label="About">
+        <span class="rail-icon"><i class="bi bi-book-fill"></i></span>
+        <span class="rail-name">Vision</span>
+      </a>
+      <a href="#founder" class="rail-tile" data-target="founder" aria-label="Founder">
+  <span class="rail-icon"><i class="bi bi-award-fill"></i></span>
+  <span class="rail-name">Founder</span>
+</a>
+      <a href="#academics" class="rail-tile" data-target="academics" aria-label="Academics">
+        <span class="rail-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        <span class="rail-name">Academics</span>
+      </a>
+      <a href="#admissions" class="rail-tile" data-target="admissions" aria-label="Admissions">
+        <span class="rail-icon"><i class="bi bi-journal-check"></i></span>
+        <span class="rail-name">Admissions</span>
+      </a>
+      <a href="#faculty" class="rail-tile" data-target="faculty" aria-label="Faculty">
+        <span class="rail-icon"><i class="bi bi-people-fill"></i></span>
+        <span class="rail-name">Directory</span>
+      </a>
+      <a href="#campus" class="rail-tile" data-target="campus" aria-label="Campus">
+        <span class="rail-icon"><i class="bi bi-building"></i></span>
+        <span class="rail-name">Campus</span>
+      </a>
+      <a href="#activities" class="rail-tile" data-target="activities" aria-label="Activities">
+        <span class="rail-icon"><i class="bi bi-palette-fill"></i></span>
+        <span class="rail-name">Activities</span>
+      </a>
+      <a href="#gallery" class="rail-tile" data-target="gallery" aria-label="Gallery">
+        <span class="rail-icon"><i class="bi bi-images"></i></span>
+        <span class="rail-name">Memories</span>
+      </a>
+      <a href="#news" class="rail-tile" data-target="news" aria-label="News & Events">
+        <span class="rail-icon"><i class="bi bi-newspaper"></i></span>
+        <span class="rail-name">Events</span>
+      </a>
+      <a href="#reviews" class="rail-tile" data-target="reviews" aria-label="Reviews">
+        <span class="rail-icon"><i class="bi bi-chat-quote-fill"></i></span>
+        <span class="rail-name">Reviews</span>
+      </a>
+
+      <a href="#downloads" class="rail-tile" data-target="downloads" aria-label="Downloads">
+  <span class="rail-icon"><i class="bi bi-cloud-arrow-down-fill"></i></span>
+  <span class="rail-name">Library</span>
+</a>
+      <a href="#contact" class="rail-tile" data-target="contact" aria-label="Contact">
+        <span class="rail-icon"><i class="bi bi-envelope-fill"></i></span>
+        <span class="rail-name">Contact</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main class="site-main">
+
+    <!-- HERO -->
+    <header id="home" class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-particles" aria-hidden="true"></div>
+      <div class="container hero-content">
+        <div class="row align-items-center min-vh-100 gy-4">
+          <div class="col-lg-7 text-center text-lg-start" data-aos="fade-right">
+            <div class="hero-badge mb-3">
+              <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
+            </div>
+            <h1 class="hero-title">Where Learning<br />Becomes Light</h1>
+            <p class="hero-subtitle">
+              A nurturing learning environment for children from Nursery to Class 8,
+              focused on knowledge, character, creativity, and confident growth.
+            </p>
+            <div class="hero-buttons">
+              <a href="#about" class="btn btn-gold btn-lg">Explore Our School</a>
+              <a href="#admissions" class="btn btn-crimson btn-lg">Apply for Admission</a>
+            </div>
+          </div>
+          <div class="col-lg-5 d-flex justify-content-center" data-aos="fade-left">
+            <div class="hero-logo-wrap">
+              <img src="logo3.png" alt="School Logo – Genesis Global Academy" class="hero-logo" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path d="M0,64 C480,120 960,0 1440,64 L1440,120 L0,120 Z" fill="#F8F7F2"></path>
+        </svg>
+      </div>
+    </header>
+
+    <!-- INFO STRIP -->
+    <section class="info-strip" aria-label="Quick information">
+      <div class="container">
+        <div class="row g-3 g-md-4 text-center">
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="info-item">
+              <i class="bi bi-people-fill info-icon"></i>
+              <span class="info-counter">
+                <span class="counter-value" data-target="450">0</span>+
+              </span>
+              <span class="info-label">Happy Students</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="info-item">
+              <i class="bi bi-book info-icon"></i>
+              <span class="info-counter">Nursery to 8th</span>
+              <span class="info-label">Complete Learning</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="info-item">
+              <i class="bi bi-flower1 info-icon"></i>
+              <span class="info-counter">150+</span>
+              <span class="info-label">Activities Offered</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
+            <div class="info-item">
+              <i class="bi bi-shield-check info-icon"></i>
+              <span class="info-counter">100%</span>
+              <span class="info-label">Safe Environment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section about-section">
+      <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+          <div class="col-lg-6" data-aos="fade-right">
+            <div class="about-image-wrapper">
+              <img src="campus.jpg" alt="School campus" class="img-fluid about-img" loading="lazy" />
+              <div class="about-decorative-line" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="col-lg-6" data-aos="fade-left">
+            <span class="section-tag">Vision</span>
+            <h2 class="section-title">Lighting the Path to Knowledge</h2>
+            <p class="section-text">
+              Inspired by the torch and open book in our emblem, we believe every child carries a light
+              that education must kindle. Our approach blends academic rigour with warmth, creativity,
+              and character formation.
+            </p>
+            <div class="about-mission-vision">
+              <div class="mv-item">
+                <i class="bi bi-bullseye mv-icon"></i>
+                <div>
+                  <h4>Our Mission</h4>
+                  <p>To provide a joyful, disciplined, and inclusive learning environment that empowers
+                    each child to discover their strengths and contribute meaningfully.</p>
+                </div>
+              </div>
+              <div class="mv-item">
+                <i class="bi bi-eye mv-icon"></i>
+                <div>
+                  <h4>Our Vision</h4>
+                  <p>To be a beacon of holistic education, where knowledge becomes light and every
+                    learner grows into a confident, compassionate global citizen.</p>
+                </div>
+              </div>
+            </div>
+            <a href="#academics" class="btn btn-navy-outline mt-3">Read More <i class="bi bi-arrow-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+     FOUNDER'S MESSAGE
+============================================================ -->
+<section id="founder" class="section founder-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="founder-card" data-aos="fade-up">
+
+          <!-- Decorative top gold line -->
+          <div class="founder-topline" aria-hidden="true"></div>
+
+          <!-- Optional small label -->
+          <span class="founder-tag">
+            <i class="bi bi-award-fill me-1"></i> Founder
+          </span>
+
+          <div class="row g-4 g-lg-5 align-items-center">
+            <!-- Founder Image -->
+            <div class="col-md-4 text-center">
+              <div class="founder-photo-wrap">
+                <img
+                  src="founder.png"
+                  alt="Genesis Global Academy"
+                  class="founder-photo"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="founder-photo-ring" aria-hidden="true"></div>
+              </div>
+
+              <h4 class="founder-name">Marhoom Ghulam Mohammad Khan <br> (Sharief Sahab)</h4>
+              <p class="founder-role">
+                Founder &amp; Visionary Thinker<br />
+                <span>Former JKAS Officer &amp; Former Director Finance</span>
+              </p>
+            </div>
+
+            <!-- Quote -->
+            <div class="col-md-8">
+              <div class="founder-quote-wrap">
+                <i class="bi bi-quote founder-quote-icon" aria-hidden="true"></i>
+                <blockquote class="founder-quote">
+                  My father dedicated his life to <strong>education</strong>, but what made him truly special was the <em>kindness and sincerity</em> with which he guided others.<br>
+Wherever life took him, he remained a <strong>teacher at heart</strong>.<br>
+He gave his time to students, listened to them, encouraged them, and helped them <strong>believe in themselves</strong>.<br>
+He never measured his work by what he received in return.<br>
+He lived simply, served quietly, and <em>left goodness wherever he went.</em><br>
+<strong>Imam Jaʿfar al Sadiq (a.s.) said:</strong><br>
+<em>“One who teaches something good to someone will receive a reward like that of the one who acts upon it, even if he dies.”</em><br>
+I cannot think of words that describe my father better.<br>
+<strong>His students remain the living memory of a life spent in the service of knowledge.</strong>
+                </blockquote>
+
+                <div class="founder-signature">
+                  <div class="founder-signature-line" aria-hidden="true"></div>
+                  <p class="founder-signature-name">Muntazir Mehdi</p>
+                  <p class="founder-signature-title">Genesis Global Academy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chairperson Note -->
+          <div class="founder-chairperson">
+            <div class="founder-chairperson-line" aria-hidden="true"></div>
+            <p class="founder-chairperson-label">With warm regards,</p>
+            <p class="founder-chairperson-name">Muntazir Mehdi</p>
+            <p class="founder-chairperson-title">Chairperson, Genesis Global Academy</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- WHY CHOOSE US -->
+    <section class="section why-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Why Choose Us</span>
+          <h2 class="section-title">A Foundation for Life</h2>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+            <div class="feature-card">
+              <i class="bi bi-journal-bookmark feature-icon"></i>
+              <h4>Strong Academic Foundation</h4>
+              <p>A carefully structured curriculum that builds conceptual clarity from the earliest years.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-card">
+              <i class="bi bi-people feature-icon"></i>
+              <h4>Holistic Development</h4>
+              <p>Equal emphasis on academics, sports, arts, and life skills for balanced growth.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-card">
+              <i class="bi bi-person-video3 feature-icon"></i>
+              <h4>Experienced & Caring Teachers</h4>
+              <p>Dedicated educators who mentor, inspire, and support every child's unique journey.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+            <div class="feature-card">
+              <i class="bi bi-puzzle feature-icon"></i>
+              <h4>Activity-Based Learning</h4>
+              <p>Hands-on experiences that make learning engaging, memorable, and meaningful.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-card">
+              <i class="bi bi-shield-lock feature-icon"></i>
+              <h4>Safe Learning Environment</h4>
+              <p>A secure, inclusive campus where children feel protected and valued.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-card">
+              <i class="bi bi-award feature-icon"></i>
+              <h4>Character & Leadership</h4>
+              <p>Opportunities that build integrity, responsibility, and leadership from a young age.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACADEMICS -->
+    <section id="academics" class="section academics-section">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Academics</span>
+          <h2 class="section-title">A Journey of Growth</h2>
+          <p class="section-subtitle mx-auto">From playful beginnings to confident middle school years.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+            <div class="academic-card">
+              <div class="academic-icon"><i class="bi bi-balloon"></i></div>
+              <h3>Early Years</h3>
+              <p class="academic-level">Nursery · LKG · UKG</p>
+              <p><strong>Age:</strong> 3–6 years</p>
+              <p><strong>Approach:</strong> Play-based, sensory, and social learning.</p>
+              <p><strong>Focus:</strong> Language, numeracy, motor skills, creativity.</p>
+            </div>
+          </div>
+          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="academic-card">
+              <div class="academic-icon"><i class="bi bi-pencil-square"></i></div>
+              <h3>Primary School</h3>
+              <p class="academic-level">Class 1 – 5</p>
+              <p><strong>Age:</strong> 6–11 years</p>
+              <p><strong>Approach:</strong> Concept-driven, activity-supported.</p>
+              <p><strong>Core Subjects:</strong> English, Maths, EVS, Hindi, Computers, Arts.</p>
+              <p><strong>Focus:</strong> Critical thinking, reading, collaboration.</p>
+            </div>
+          </div>
+          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="academic-card">
+              <div class="academic-icon"><i class="bi bi-lightbulb"></i></div>
+              <h3>Middle School</h3>
+              <p class="academic-level">Class 6 – 8</p>
+              <p><strong>Age:</strong> 11–14 years</p>
+              <p><strong>Approach:</strong> Inquiry-based, subject-specialised.</p>
+              <p><strong>Core Subjects:</strong> English, Maths, Science, Social Science, Hindi, Computers.</p>
+              <p><strong>Focus:</strong> Analytical skills, research, leadership.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLASSES -->
+    <section id="classes" class="section classes-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Classes</span>
+          <h2 class="section-title">Every Stage, Every Child</h2>
+        </div>
+        <div class="row g-3 g-md-4">
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="class-card">
+              <h4>Nursery</h4>
+              <p>Playful introduction to school life.</p>
+              <span class="class-focus">Focus: Social & motor skills</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+            <div class="class-card">
+              <h4>LKG</h4>
+              <p>Building curiosity and early literacy.</p>
+              <span class="class-focus">Focus: Language & numbers</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="class-card">
+              <h4>UKG</h4>
+              <p>Preparing for formal schooling.</p>
+              <span class="class-focus">Focus: Reading & writing</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+            <div class="class-card">
+              <h4>Class 1</h4>
+              <p>Foundational academics with joy.</p>
+              <span class="class-focus">Focus: English & Maths</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="class-card">
+              <h4>Class 2</h4>
+              <p>Strengthening concepts through activity.</p>
+              <span class="class-focus">Focus: EVS & Language</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+            <div class="class-card">
+              <h4>Class 3</h4>
+              <p>Building independence and inquiry.</p>
+              <span class="class-focus">Focus: Science & Maths</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="class-card">
+              <h4>Class 4</h4>
+              <p>Expanding knowledge and skills.</p>
+              <span class="class-focus">Focus: Social & Computers</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+            <div class="class-card">
+              <h4>Class 5</h4>
+              <p>Preparing for middle school.</p>
+              <span class="class-focus">Focus: All core subjects</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="class-card">
+              <h4>Class 6</h4>
+              <p>Transition to specialised learning.</p>
+              <span class="class-focus">Focus: Science & Maths</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+            <div class="class-card">
+              <h4>Class 7</h4>
+              <p>Deepening analytical thinking.</p>
+              <span class="class-focus">Focus: Labs & projects</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="class-card">
+              <h4>Class 8</h4>
+              <p>Ready for high school challenges.</p>
+              <span class="class-focus">Focus: Leadership & research</span>
+              <a href="#admissions" class="class-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMISSIONS -->
+    <section id="admissions" class="section admissions-section">
+      <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+          <div class="col-lg-5" data-aos="fade-right">
+            <span class="section-tag">Admissions</span>
+            <h2 class="section-title">Admissions Open</h2>
+            <div class="admission-badge mb-3"><i class="bi bi-megaphone-fill me-2"></i>Academic Session 2026–27</div>
+            <p class="section-text">
+              We welcome applications for Nursery through Class 8. Our admission process is
+              transparent, parent-friendly, and designed to ensure the right fit for every child.
+            </p>
+            <ul class="admission-list">
+              <li><i class="bi bi-check-circle-fill"></i> Age-appropriate eligibility</li>
+              <li><i class="bi bi-check-circle-fill"></i> Simple online application</li>
+              <li><i class="bi bi-check-circle-fill"></i> Interaction with child & parents</li>
+            </ul>
+            <a href="#admissionForm" class="btn btn-crimson btn-lg mt-3">Apply for Admission <i class="bi bi-arrow-right ms-1"></i></a>
+          </div>
+          <div class="col-lg-7" data-aos="fade-left">
+            <div class="admission-info-card">
+              <h3>Admission Process</h3>
+              <ol class="admission-steps">
+                <li><span class="step-num">1</span> Submit online application</li>
+                <li><span class="step-num">2</span> School review & contact</li>
+                <li><span class="step-num">3</span> Interaction / campus visit</li>
+                <li><span class="step-num">4</span> Confirmation & fee payment</li>
+              </ol>
+              <hr />
+              <h4>Required Documents</h4>
+              <ul class="doc-list">
+                <li>Birth certificate (copy)</li>
+                <li>Previous school records (if applicable)</li>
+                <li>Passport-size photographs</li>
+                <li>Address proof</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMISSION FORM -->
+    <section id="admissionForm" class="section admission-form-section bg-ivory">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="form-wrapper" data-aos="fade-up">
+              <div class="text-center mb-4">
+                <h2 class="section-title">Admission Application</h2>
+                <p class="text-muted">Fields marked with <span class="required">*</span> are required.</p>
+              </div>
+              <form id="admissionFormElement" novalidate>
+                <h4 class="form-section-title"><i class="bi bi-person-badge me-2"></i>Student Information</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="studentName" class="form-label">Student Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="studentName" name="studentName" required />
+                    <div class="invalid-feedback" id="studentNameError"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="dateOfBirth" class="form-label">Date of Birth <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required />
+                    <div class="invalid-feedback" id="dateOfBirthError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="gender" class="form-label">Gender <span class="required">*</span></label>
+                    <select class="form-select" id="gender" name="gender" required>
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    <div class="invalid-feedback" id="genderError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="applyingClass" class="form-label">Applying Class <span class="required">*</span></label>
+                    <select class="form-select" id="applyingClass" name="applyingClass" required>
+                      <option value="">Select</option>
+                      <option>Nursery</option><option>LKG</option><option>UKG</option>
+                      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+                      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+                      <option>Class 7</option><option>Class 8</option>
+                    </select>
+                    <div class="invalid-feedback" id="applyingClassError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="academicSession" class="form-label">Academic Session <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="academicSession" name="academicSession" value="2026–27" required readonly />
+                    <div class="invalid-feedback" id="academicSessionError"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="previousSchool" class="form-label">Previous School (if any)</label>
+                    <input type="text" class="form-control" id="previousSchool" name="previousSchool" />
+                  </div>
+                </div>
+
+                <h4 class="form-section-title mt-4"><i class="bi bi-people me-2"></i>Parent / Guardian Information</h4>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label for="fatherName" class="form-label">Father's Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="fatherName" name="fatherName" required />
+                    <div class="invalid-feedback" id="fatherNameError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="motherName" class="form-label">Mother's Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="motherName" name="motherName" required />
+                    <div class="invalid-feedback" id="motherNameError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="guardianName" class="form-label">Guardian Name (if applicable)</label>
+                    <input type="text" class="form-control" id="guardianName" name="guardianName" />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="mobile" class="form-label">Mobile Number <span class="required">*</span></label>
+                    <input type="tel" class="form-control" id="mobile" name="mobile" required />
+                    <div class="invalid-feedback" id="mobileError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="whatsapp" class="form-label">WhatsApp Number</label>
+                    <input type="tel" class="form-control" id="whatsapp" name="whatsapp" />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+                    <input type="email" class="form-control" id="email" name="email" required />
+                    <div class="invalid-feedback" id="emailError"></div>
+                  </div>
+                </div>
+
+                <h4 class="form-section-title mt-4"><i class="bi bi-geo-alt me-2"></i>Address</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="address" class="form-label">House / Street <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="address" name="address" required />
+                    <div class="invalid-feedback" id="addressError"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="area" class="form-label">Area</label>
+                    <input type="text" class="form-control" id="area" name="area" />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="city" class="form-label">City <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="city" name="city" required />
+                    <div class="invalid-feedback" id="cityError"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="district" class="form-label">District</label>
+                    <input type="text" class="form-control" id="district" name="district" />
+                  </div>
+                  <div class="col-md-2">
+                    <label for="state" class="form-label">State</label>
+                    <input type="text" class="form-control" id="state" name="state" />
+                  </div>
+                  <div class="col-md-2">
+                    <label for="pinCode" class="form-label">PIN Code</label>
+                    <input type="text" class="form-control" id="pinCode" name="pinCode" />
+                  </div>
+                </div>
+
+                <h4 class="form-section-title mt-4"><i class="bi bi-info-circle me-2"></i>Additional Information</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="emergencyContact" class="form-label">Emergency Contact</label>
+                    <input type="tel" class="form-control" id="emergencyContact" name="emergencyContact" />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="previousAcademicInfo" class="form-label">Previous Academic Information</label>
+                    <input type="text" class="form-control" id="previousAcademicInfo" name="previousAcademicInfo" />
+                  </div>
+                  <div class="col-12">
+                    <label for="additionalInformation" class="form-label">Message / Additional Information</label>
+                    <textarea class="form-control" id="additionalInformation" name="additionalInformation" rows="3"></textarea>
+                  </div>
+                </div>
+
+                <div class="form-check mt-4">
+                  <input class="form-check-input" type="checkbox" id="consent" name="consent" required />
+                  <label class="form-check-label" for="consent">
+                    I confirm that the information provided is accurate. <span class="required">*</span>
+                  </label>
+                  <div class="invalid-feedback" id="consentError"></div>
+                </div>
+
+                <div class="text-center mt-4">
+                  <button type="submit" class="btn btn-crimson btn-lg px-5" id="submitBtn">
+                    <span class="spinner-border spinner-border-sm d-none me-2" id="submitSpinner" role="status" aria-hidden="true"></span>
+                    <span id="submitText">Submit Admission Application</span>
+                  </button>
+                </div>
+              </form>
+
+              <div id="successMessage" class="success-card d-none">
+                <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <h3>Application Submitted Successfully</h3>
+                <p>Your admission enquiry has been received. The school administration will contact you using the details provided.</p>
+                <div class="reference-box">
+                  <p><strong>Reference ID:</strong> <span id="refId"></span></p>
+                  <p><strong>Date:</strong> <span id="refDate"></span></p>
+                </div>
+                <div class="mt-4">
+                  <button class="btn btn-navy-outline me-2" id="printBtn"><i class="bi bi-file-earmark-arrow-down me-1"></i>Download PDF</button>
+                  <button class="btn btn-crimson" id="backBtn">Back to Website</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FACULTY -->
+    <section id="faculty" class="section faculty-section">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Contact Directory</span>
+          <h2 class="section-title">Department and office contacts.</h2>
+          <p class="section-subtitle mx-auto">
+            Reach out to any of our member directly. We're always happy to help.
+          </p>
+        </div>
+
+        <div class="faculty-filters" role="tablist" aria-label="Faculty departments">
+  <button class="faculty-filter active" data-dept="all" role="tab" aria-selected="true">
+    <i class="bi bi-people-fill"></i> All
+  </button>
+  <button class="faculty-filter" data-dept="leadership" role="tab" aria-selected="false">
+    <i class="bi bi-award-fill"></i> Leadership
+  </button>
+  <button class="faculty-filter" data-dept="management" role="tab" aria-selected="false">
+    <i class="bi bi-briefcase-fill"></i> Management
+  </button>
+</div>
+
+        <div class="faculty-grid" id="facultyGrid"></div>
+      </div>
+    </section>
+
+    <!-- CAMPUS -->
+    <section id="campus" class="section campus-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Campus</span>
+          <h2 class="section-title">Spaces That Inspire</h2>
+        </div>
+        <div class="row g-4">
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="0">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Smart Classrooms">
+      <img src="c5.jpg" alt="Smart Classroom" loading="lazy" />
+      <div class="campus-label">Smart Classrooms</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Library">
+      <img src="library.jpg" alt="Library" loading="lazy" />
+      <div class="campus-label">Library</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Science Learning">
+      <img src="computer.jpg" alt="Science Learning" loading="lazy" />
+      <div class="campus-label">Computer Lab</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Computer Education">
+      <img src="event4.jpg" alt="Computer Education" loading="lazy" />
+      <div class="campus-label">Cultural Fest</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="0">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Sports">
+      <img src="sports3.jpg" alt="Sports" loading="lazy" />
+      <div class="campus-label">Sports</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Activity Areas">
+      <img src="activity5.jpg" alt="Activity Areas" loading="lazy" />
+      <div class="campus-label">Activity Areas</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Safe Campus">
+      <img src="campus.jpg" alt="Safe Campus" loading="lazy" />
+      <div class="campus-label">Safe Campus</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+    <div class="campus-card lightbox-trigger" role="button" tabindex="0" aria-label="View Creative Spaces">
+      <img src="event2.jpg" alt="Creative Learning Spaces" loading="lazy" />
+      <div class="campus-label">Creative Spaces</div>
+    </div>
+  </div>
+</div>
+      </div>
+    </section>
+
+    <!-- ACTIVITIES -->
+    <section id="activities" class="section activities-section">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Student Activities</span>
+          <h2 class="section-title">Beyond the Classroom</h2>
+        </div>
+        <div class="row g-3 g-md-4">
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="activity-card"><i class="bi bi-trophy activity-icon"></i><h4>Sports</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+            <div class="activity-card"><i class="bi bi-palette activity-icon"></i><h4>Art</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="activity-card"><i class="bi bi-music-note-beamed activity-icon"></i><h4>Music</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+            <div class="activity-card"><i class="bi bi-chat-quote activity-icon"></i><h4>Debate</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+            <div class="activity-card"><i class="bi bi-eyedropper activity-icon"></i><h4>Science</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+            <div class="activity-card"><i class="bi bi-book activity-icon"></i><h4>Reading</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="activity-card"><i class="bi bi-globe activity-icon"></i><h4>Cultural</h4></div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+            <div class="activity-card"><i class="bi bi-tree activity-icon"></i><h4>Environmental</h4></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="section gallery-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Wall of Memories</span>
+          <h2 class="section-title">A collection of memories.</h2>
+          <p class="section-subtitle mx-auto">
+            A curated journal of our school life....
+          </p>
+        </div>
+        <div class="journal-grid" id="journalGrid"></div>
+      </div>
+    </section>
+
+    <!-- NEWS -->
+    <section id="news" class="section news-section">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">News & Events</span>
+          <h2 class="section-title">What's Happening</h2>
+        </div>
+
+        <div class="row g-2 g-md-4" id="newsContainer">
+          <div class="col-md-6 col-lg-4">
+            <article class="news-card news-skeleton">
+              <div class="skeleton-line short"></div>
+              <div class="skeleton-line tiny"></div>
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <article class="news-card news-skeleton">
+              <div class="skeleton-line short"></div>
+              <div class="skeleton-line tiny"></div>
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <article class="news-card news-skeleton">
+              <div class="skeleton-line short"></div>
+              <div class="skeleton-line tiny"></div>
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <article class="news-card news-skeleton">
+              <div class="skeleton-line short"></div>
+              <div class="skeleton-line tiny"></div>
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </article>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <article class="news-card news-skeleton">
+              <div class="skeleton-line short"></div>
+              <div class="skeleton-line tiny"></div>
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </article>
+          </div>
+        </div>
+
+        <div id="newsEmptyState" class="text-center d-none mt-3">
+          <p class="text-muted">No news or events published yet. Please check back soon.</p>
+        </div>
+        <div id="newsErrorState" class="text-center d-none mt-3">
+          <p class="text-muted"><i class="bi bi-wifi-off me-1"></i>Unable to load news & events right now.</p>
+        </div>
+
+        <nav id="newsPagination" class="news-pagination d-none" aria-label="News pagination">
+          <button class="news-page-btn" id="newsPrevBtn" aria-label="Previous page">
+            <i class="bi bi-chevron-left"></i> Prev
+          </button>
+          <div id="newsPageNumbers" class="news-page-numbers"></div>
+          <button class="news-page-btn" id="newsNextBtn" aria-label="Next page">
+            Next <i class="bi bi-chevron-right"></i>
+          </button>
+        </nav>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section id="reviews" class="section reviews-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Reviews</span>
+          <h2 class="section-title">What Parents & Students Say</h2>
+          <p class="section-subtitle mx-auto">Share your experience — your review will appear on our website after school approval.</p>
+        </div>
+
+        <div class="review-form-wrapper" data-aos="fade-up">
+          <h3 class="review-form-title">
+            <i class="bi bi-pencil-square me-2"></i>Write a Review
+          </h3>
+          <form id="reviewForm" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="reviewName" class="form-label">Your Name <span class="required">*</span></label>
+                <input type="text" class="form-control" id="reviewName" placeholder="e.g. Muntazir Mehdi" maxlength="60" required />
+                <div class="invalid-feedback" id="reviewNameError"></div>
+              </div>
+              <div class="col-md-6">
+                <label for="reviewRole" class="form-label">Your Role (optional)</label>
+                <input type="text" class="form-control" id="reviewRole" placeholder="e.g. Parent of Class 3 Student" maxlength="100" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Your Rating <span class="required">*</span></label>
+                <div class="star-rating" id="starRating" role="radiogroup" aria-label="Star rating">
+                  <i class="bi bi-star-fill star-btn" data-rating="1" role="radio" aria-label="1 star" tabindex="0"></i>
+                  <i class="bi bi-star-fill star-btn" data-rating="2" role="radio" aria-label="2 stars" tabindex="0"></i>
+                  <i class="bi bi-star-fill star-btn" data-rating="3" role="radio" aria-label="3 stars" tabindex="0"></i>
+                  <i class="bi bi-star-fill star-btn" data-rating="4" role="radio" aria-label="4 stars" tabindex="0"></i>
+                  <i class="bi bi-star-fill star-btn" data-rating="5" role="radio" aria-label="5 stars" tabindex="0"></i>
+                </div>
+                <input type="hidden" id="reviewStars" value="0" />
+                <small class="star-hint" id="starHint">Tap a star to rate</small>
+                <div class="invalid-feedback" id="reviewStarsError"></div>
+              </div>
+              <div class="col-12">
+                <label for="reviewMessage" class="form-label">Your Review <span class="required">*</span></label>
+                <textarea class="form-control" id="reviewMessage" rows="4" placeholder="Share your experience with our school..." maxlength="1000" required></textarea>
+                <div class="invalid-feedback" id="reviewMessageError"></div>
+              </div>
+              <div class="col-12 text-center">
+                <button type="submit" class="btn btn-crimson btn-lg px-5" id="reviewSubmitBtn">
+                  <span class="spinner-border spinner-border-sm d-none me-2" id="reviewSpinner" role="status" aria-hidden="true"></span>
+                  <span id="reviewSubmitText">Submit Review</span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div id="reviewSuccess" class="review-success d-none">
+            <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <h4>Thank You for Your Review!</h4>
+            <p>Your feedback has been received. It will appear on our website once approved by the school.</p>
+            <button class="btn btn-navy-outline mt-2" id="reviewAgainBtn">Write Another Review</button>
+          </div>
+        </div>
+
+        <div class="reviews-display" data-aos="fade-up">
+          <h3 class="reviews-display-title">
+            <i class="bi bi-chat-quote me-2"></i>Recent Reviews
+          </h3>
+          <div class="row g-4" id="reviewsContainer">
+            <div class="col-md-6 col-lg-4">
+              <article class="review-card review-skeleton">
+                <div class="skeleton-line tiny"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
+              </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <article class="review-card review-skeleton">
+                <div class="skeleton-line tiny"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
+              </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <article class="review-card review-skeleton">
+                <div class="skeleton-line tiny"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
+              </article>
+            </div>
+          </div>
+
+          <div id="reviewsEmptyState" class="text-center d-none mt-3">
+            <p class="text-muted">No reviews yet. Be the first to share your experience!</p>
+          </div>
+          <div id="reviewsErrorState" class="text-center d-none mt-3">
+            <p class="text-muted"><i class="bi bi-wifi-off me-1"></i>Unable to load reviews right now.</p>
+          </div>
+
+          <nav id="reviewsPagination" class="news-pagination d-none" aria-label="Reviews pagination">
+            <button class="news-page-btn" id="reviewsPrevBtn" aria-label="Previous page">
+              <i class="bi bi-chevron-left"></i> Prev
+            </button>
+            <div id="reviewsPageNumbers" class="news-page-numbers"></div>
+            <button class="news-page-btn" id="reviewsNextBtn" aria-label="Next page">
+              Next <i class="bi bi-chevron-right"></i>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+     DOWNLOADS JOURNAL — Library-style resource center
+============================================================ -->
+<section id="downloads" class="section downloads-section">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <span class="section-tag">Resources</span>
+      <h2 class="section-title">The Learning Library</h2>
+      <p class="section-subtitle mx-auto">
+        Access syllabus, textbooks, past papers, articles, and curated online resources — organized by class.
+      </p>
+    </div>
+
+    <!-- Class filter chips -->
+    <div class="downloads-filters" role="tablist" aria-label="Filter by class">
+      <button class="download-filter active" data-class="all" role="tab" aria-selected="true">
+        <i class="bi bi-grid-3x3-gap-fill"></i> All
+      </button>
+      <button class="download-filter" data-class="nursery" role="tab" aria-selected="false">
+        <i class="bi bi-balloon-fill"></i> Nursery
+      </button>
+      <button class="download-filter" data-class="lkg" role="tab" aria-selected="false">
+        <i class="bi bi-balloon-fill"></i> LKG
+      </button>
+      <button class="download-filter" data-class="ukg" role="tab" aria-selected="false">
+        <i class="bi bi-balloon-fill"></i> UKG
+      </button>
+      <button class="download-filter" data-class="class1" role="tab" aria-selected="false">
+        <i class="bi bi-pencil-fill"></i> Class 1
+      </button>
+      <button class="download-filter" data-class="class2" role="tab" aria-selected="false">
+        <i class="bi bi-pencil-fill"></i> Class 2
+      </button>
+      <button class="download-filter" data-class="class3" role="tab" aria-selected="false">
+        <i class="bi bi-pencil-fill"></i> Class 3
+      </button>
+      <button class="download-filter" data-class="class4" role="tab" aria-selected="false">
+        <i class="bi bi-pencil-fill"></i> Class 4
+      </button>
+      <button class="download-filter" data-class="class5" role="tab" aria-selected="false">
+        <i class="bi bi-pencil-fill"></i> Class 5
+      </button>
+      <button class="download-filter" data-class="class6" role="tab" aria-selected="false">
+        <i class="bi bi-mortarboard-fill"></i> Class 6
+      </button>
+      <button class="download-filter" data-class="class7" role="tab" aria-selected="false">
+        <i class="bi bi-mortarboard-fill"></i> Class 7
+      </button>
+      <button class="download-filter" data-class="class8" role="tab" aria-selected="false">
+        <i class="bi bi-mortarboard-fill"></i> Class 8
+      </button>
+      <button class="download-filter" data-class="misc" role="tab" aria-selected="false">
+        <i class="bi bi-star-fill"></i> Miscellaneous
+      </button>
+    </div>
+
+    <!-- Resource grid -->
+    <div class="downloads-grid" id="downloadsGrid">
+      <!-- Skeleton cards (6 shown initially) -->
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="download-card download-skeleton">
+        <div class="skeleton-line tiny"></div>
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+
+    <div id="downloadsEmptyState" class="text-center d-none mt-4">
+      <p class="text-muted">No resources available yet. Please check back soon.</p>
+    </div>
+    <div id="downloadsErrorState" class="text-center d-none mt-4">
+      <p class="text-muted"><i class="bi bi-wifi-off me-1"></i>Unable to load resources right now.</p>
+    </div>
+
+    <nav id="downloadsPagination" class="news-pagination d-none" aria-label="Downloads pagination">
+      <button class="news-page-btn" id="downloadsPrevBtn" aria-label="Previous page">
+        <i class="bi bi-chevron-left"></i> Prev
+      </button>
+      <div id="downloadsPageNumbers" class="news-page-numbers"></div>
+      <button class="news-page-btn" id="downloadsNextBtn" aria-label="Next page">
+        Next <i class="bi bi-chevron-right"></i>
+      </button>
+    </nav>
+  </div>
+</section>
+
+    <!-- ============================================================
+     NEWS DETAIL DIALOG
+============================================================ -->
+<div id="newsDialog" class="news-dialog d-none" role="dialog" aria-modal="true" aria-labelledby="newsDialogTitle">
+  <div class="news-dialog-overlay"></div>
+  <div class="news-dialog-content">
+    <button class="news-dialog-close" id="newsDialogClose" aria-label="Close dialog">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="news-dialog-body">
+      <div id="newsDialogHeroSlot"></div>
+      <div class="news-dialog-meta">
+        <span class="news-dialog-category" id="newsDialogCategory">News</span>
+        <span class="news-dialog-date" id="newsDialogDate"></span>
+      </div>
+      <h2 class="news-dialog-title" id="newsDialogTitle"></h2>
+      <div class="news-dialog-text" id="newsDialogBody"></div>
+    </div>
+  </div>
+</div>
+
+    <!-- CTA -->
+    <section class="section cta-section">
+      <div class="cta-overlay"></div>
+      <div class="container text-center position-relative">
+        <h2 class="cta-title" data-aos="fade-up">Begin Your Child's Journey</h2>
+        <p class="cta-text" data-aos="fade-up" data-aos-delay="100">
+          Explore our learning environment and take the first step toward admission.
+        </p>
+        <div class="cta-buttons" data-aos="fade-up" data-aos-delay="200">
+          <a href="#admissionForm" class="btn btn-crimson btn-lg">Apply for Admission</a>
+          <a href="#contact" class="btn btn-gold-outline btn-lg">Contact School</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact-section bg-ivory">
+      <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+          <span class="section-tag">Contact</span>
+          <h2 class="section-title">Get in Touch</h2>
+        </div>
+        <div class="row g-4 g-lg-5">
+          <div class="col-lg-5" data-aos="fade-right">
+            <div class="contact-info">
+              <div class="contact-item"><i class="bi bi-geo-alt-fill"></i>
+                <div><h4>Address</h4><p>[Budgam, J&K, 191111]</p></div>
+              </div>
+              <div class="contact-item"><i class="bi bi-telephone-fill"></i>
+                <div><h4>Phone</h4><p>[+919622222723]</p></div>
+              </div>
+              <div class="contact-item"><i class="bi bi-envelope-fill"></i>
+                <div><h4>Email</h4><p>[genesisglobal@gmail.com]</p></div>
+              </div>
+              <div class="contact-item"><i class="bi bi-clock-fill"></i>
+                <div><h4>Office Hours</h4><p>Mon–Sat: 8:00 AM – 5:00 PM</p></div>
+              </div>
+            </div>
+            <div class="map-placeholder mt-4">
+  <iframe
+    src="https://www.google.com/maps?q=34.0036886,74.7003737&output=embed"
+    width="100%"
+    height="200"
+    style="border:0;border-radius:12px;"
+    allowfullscreen=""
+    loading="lazy"
+    title="School location map">
+  </iframe>
+            </div>
+          </div>
+          <div class="col-lg-7" data-aos="fade-left">
+            <form id="contactForm" class="contact-form" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="contactName" class="form-label">Name <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="contactName" maxlength="100" required />
+                  <div class="invalid-feedback" id="contactNameError"></div>
+                </div>
+                <div class="col-md-6">
+                  <label for="contactEmail" class="form-label">Email <span class="required">*</span></label>
+                  <input type="email" class="form-control" id="contactEmail" required />
+                  <div class="invalid-feedback" id="contactEmailError"></div>
+                </div>
+                <div class="col-md-6">
+                  <label for="contactPhone" class="form-label">Phone</label>
+                  <input type="tel" class="form-control" id="contactPhone" maxlength="20" />
+                  <div class="invalid-feedback" id="contactPhoneError"></div>
+                </div>
+                <div class="col-md-6">
+                  <label for="contactSubject" class="form-label">Subject</label>
+                  <input type="text" class="form-control" id="contactSubject" maxlength="150" />
+                </div>
+                <div class="col-12">
+                  <label for="contactMessage" class="form-label">Message <span class="required">*</span></label>
+                  <textarea class="form-control" id="contactMessage" rows="4" maxlength="2000" required></textarea>
+                  <div class="invalid-feedback" id="contactMessageError"></div>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-crimson" id="contactSubmitBtn">
+                    <span class="spinner-border spinner-border-sm d-none me-2" id="contactSpinner" role="status" aria-hidden="true"></span>
+                    <span id="contactSubmitText">Send Message</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div id="contactSuccess" class="contact-success d-none">
+              <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+              <h4>Message Sent Successfully</h4>
+              <p>Thank you for reaching out. The school will get back to you using the details you provided.</p>
+              <button class="btn btn-navy-outline mt-2" id="contactBackBtn">Send Another Message</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row g-4 g-lg-5">
+          <div class="col-lg-4">
+            <img src="logo1.png" alt="School Logo" class="footer-logo mb-3" />
+            <h5 class="footer-brand">Genesis Global Academy</h5>
+            <p class="footer-text">A nurturing learning environment from Nursery to Class 8,
+              focused on knowledge, character, creativity, and confident growth.</p>
+          </div>
+          <div class="col-6 col-lg-2">
+            <h5>Quick Links</h5>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">Vision</a></li>
+              <li><a href="#academics">Academics</a></li>
+              <li><a href="#admissions">Admissions</a></li>
+              <li><a href="#faculty">Directory</a></li>
+              <li><a href="#gallery">Gallery</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+          <div class="col-6 col-lg-3">
+            <h5>Academics</h5>
+            <ul class="footer-links">
+              <li><a href="#classes">Nursery</a></li>
+              <li><a href="#classes">LKG</a></li>
+              <li><a href="#classes">UKG</a></li>
+              <li><a href="#classes">Classes 1 to 5</a></li>
+              <li><a href="#classes">Classes 6 to 8</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-3">
+            <h5>Contact</h5>
+            <ul class="footer-links">
+              <li><i class="bi bi-geo-alt me-2"></i>[Budgam, J&K, 191111]</li>
+              <li><i class="bi bi-telephone me-2"></i>[+919622222723]</li>
+              <li><i class="bi bi-envelope me-2"></i>[genesisglobal@gmail.com]</li>
+            </ul>
+            <div class="social-icons mt-3">
+              <a href="https://www.facebook.com/genesisglobalacademy.org/" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              <a href="https://www.instagram.com/genesisglobalkashmir/" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+              <a href="https://youtube.com/@genesisglobalacademykashmi2527?si=pCdrBiparnbf3U5w" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+        <hr class="footer-divider" />
+        <div class="footer-bottom d-flex flex-wrap justify-content-between">
+          <p class="mb-0">© 2026 Genesis Global Academy. All Rights Reserved.</p>
+          
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top"><i class="bi bi-arrow-up"></i></button>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox d-none" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close (Esc)" title="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <button class="lightbox-prev" id="lightboxPrev" aria-label="Previous image (Left arrow)" title="Previous">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <img src="" alt="Enlarged image" class="lightbox-img" id="lightboxImg" />
+    <button class="lightbox-next" id="lightboxNext" aria-label="Next image (Right arrow)" title="Next">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="script.js"></script>
+
+  <!-- ============================================================
+     PWA INSTALL PROMPT
+============================================================ -->
+<div id="pwaInstallBanner" class="pwa-install-banner d-none" role="dialog" aria-live="polite" aria-label="Install app">
+  <div class="pwa-install-content">
+    <div class="pwa-install-icon">
+      <img src="icon-192x192.png" alt="App icon" />
+    </div>
+    <div class="pwa-install-text">
+      <strong>Install Genesis Global Academy</strong>
+      <span>Add to your home screen for quick access</span>
+    </div>
+    <div class="pwa-install-actions">
+      <button class="pwa-install-btn" id="pwaInstallBtn">
+        <i class="bi bi-download"></i> Install
+      </button>
+      <button class="pwa-install-close" id="pwaInstallClose" aria-label="Dismiss">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
