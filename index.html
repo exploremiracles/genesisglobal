@@ -135,20 +135,19 @@
     
     <!-- Desktop only: video (CSS hides on mobile via display:none) -->
     <video
-      class="hero-media-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="metadata"
-      poster="poster.jpg"
-      disablepictureinpicture
-    >
-      <source src="bgvideo.mp4" type="video/mp4" />
-      <!-- Optional: add webm for smaller file size on modern browsers
-      <source src="hero-video.webm" type="video/webm" />
-      -->
-    </video>
+  class="hero-media-video"
+  autoplay
+  muted
+  loop
+  playsinline
+  webkit-playsinline           
+  preload="auto"                
+  poster="poster.jpg"
+  disablepictureinpicture
+  disableremoteplayback
+>
+  <source src="bgvideo.mp4" type="video/mp4" />
+</video>
   </div>
 
   <!-- Existing navy tint overlay -->
