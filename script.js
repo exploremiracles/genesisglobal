@@ -1,4 +1,19 @@
-
+/* ============================================================
+   SCHOOL WEBSITE — MAIN JAVASCRIPT
+   ============================================================
+   Features:
+   - Firebase Firestore (compat SDK v9)
+   - Always-visible bottom section rail
+   - Active section highlight on scroll
+   - Animated counter (450+)
+   - News & Events (paginated 5/page, full-screen dialog)
+   - Reviews (public submission + admin-approval gated display)
+   - Faculty Directory (name + role + contact number)
+   - Downloads Journal (filterable, paginated, live)
+   - Admission form submission + PDF download
+   - Contact form submission
+   - Gallery journal + unified lightbox
+============================================================ */
 
 /* ============================================================
    FIREBASE CONFIG — REPLACE WITH YOUR OWN
@@ -2254,19 +2269,58 @@ window.addEventListener('resize', () => {
     }, 6000);
   }
 })();
+
 /* ============================================================
-   HERO VIDEO — pause when tab hidden, resume when visible
+   HERO VIDEO — robust autoplay + pause when tab hidden
 ============================================================ */
 (function initHeroVideo() {
   const video = document.querySelector('.hero-media-video');
   if (!video) return;
 
-  // Some browsers still need an explicit play() after page load
-  const tryPlay = () => video.play().catch(() => { /* autoplay blocked — poster stays */ });
+  let hasStarted = false;
+
+  const tryPlay = () => {
+    const p = video.play();
+    if (p && typeof p.then === 'function') {
+      p.then(() => { hasStarted = true; }).catch(() => { /* still blocked */ });
+    } else {
+      hasStarted = true;
+    }
+  };
+
+  // Initial attempt — may fail silently on mobile
   tryPlay();
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) video.pause();
-    else tryPlay();
+  // Retry on first real user interaction (tap, click, key, scroll)
+  const retryOnInteraction = () => {
+    if (hasStarted && !video.paused) return;
+    tryPlay();
+  };
+
+  const interactionEvents = ['touchstart', 'pointerdown', 'click', 'keydown', 'scroll'];
+  interactionEvents.forEach(evt => {
+    window.addEventListener(evt, retryOnInteraction, { passive: true, once: false });
   });
+
+  // Also retry when the video becomes visible in the viewport
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) retryOnInteraction();
+      });
+    }, { threshold: 0.1 });
+    io.observe(video);
+  }
+
+  // Pause when the tab is hidden, resume when visible again
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      video.pause();
+    } else {
+      tryPlay();
+    }
+  });
+
+  // Some browsers fire 'canplay' late; retry then too
+  video.addEventListener('canplay', retryOnInteraction, { once: true });
 })();
