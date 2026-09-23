@@ -127,38 +127,50 @@
   <main class="site-main">
 
     <!-- HERO -->
-    <header id="home" class="hero-section">
-      <div class="hero-overlay"></div>
-      <div class="hero-particles" aria-hidden="true"></div>
-      <div class="container hero-content">
-        <div class="row align-items-center min-vh-100 gy-4">
-          <div class="col-lg-7 text-center text-lg-start" data-aos="fade-right">
-            <div class="hero-badge mb-3">
-              <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
-            </div>
-            <h1 class="hero-title">Where Learning<br />Becomes Light</h1>
-            <p class="hero-subtitle">
-              A nurturing learning environment for children from Nursery to Class 8,
-              focused on knowledge, character, creativity, and confident growth.
-            </p>
-            <div class="hero-buttons">
-              <a href="#about" class="btn btn-gold btn-lg">Explore Our School</a>
-              <a href="#admissions" class="btn btn-crimson btn-lg">Apply for Admission</a>
-            </div>
-          </div>
-          <div class="col-lg-5 d-flex justify-content-center" data-aos="fade-left">
-            <div class="hero-logo-wrap">
-              <img src="logo3.png" alt="School Logo – Genesis Global Academy" class="hero-logo" />
-            </div>
-          </div>
+    <!-- HERO -->
+<header id="home" class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="hero-particles" aria-hidden="true"></div>
+  <div class="container hero-content">
+    <div class="row align-items-center gy-4">
+
+      <!-- Mobile-only logo: first element, above everything -->
+      <div class="col-12 d-lg-none text-center" data-aos="fade-down">
+        <div class="hero-logo-mobile">
+          <img src="logo3.png" alt="School Logo – Genesis Global Academy" class="hero-logo" />
         </div>
       </div>
-      <div class="hero-wave" aria-hidden="true">
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path d="M0,64 C480,120 960,0 1440,64 L1440,120 L0,120 Z" fill="#F8F7F2"></path>
-        </svg>
+
+      <div class="col-lg-7 text-center text-lg-start" data-aos="fade-right">
+        <div class="hero-badge mb-3">
+          <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
+        </div>
+        <h1 class="hero-title">Where Learning<br />Becomes Light</h1>
+        <p class="hero-subtitle">
+          A nurturing learning environment for children from Nursery to Class 8,
+          focused on knowledge, character, creativity, and confident growth.
+        </p>
+        <div class="hero-buttons">
+          <a href="#about" class="btn btn-gold btn-lg">Explore Our School</a>
+          <a href="#admissions" class="btn btn-crimson btn-lg">Apply for Admission</a>
+        </div>
       </div>
-    </header>
+
+      <!-- Desktop/tablet-only logo: right column -->
+      <div class="col-lg-5 d-none d-lg-flex justify-content-center" data-aos="fade-left">
+        <div class="hero-logo-wrap">
+          <img src="logo3.png" alt="School Logo – Genesis Global Academy" class="hero-logo" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="hero-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path d="M0,64 C480,120 960,0 1440,64 L1440,120 L0,120 Z" fill="#F8F7F2"></path>
+    </svg>
+  </div>
+</header>
 
     <!-- INFO STRIP -->
     <section class="info-strip" aria-label="Quick information">
@@ -181,12 +193,14 @@
             </div>
           </div>
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
-            <div class="info-item">
-              <i class="bi bi-flower1 info-icon"></i>
-              <span class="info-counter">150+</span>
-              <span class="info-label">Activities Offered</span>
-            </div>
-          </div>
+  <div class="info-item">
+    <i class="bi bi-flower1 info-icon"></i>
+    <span class="info-counter">
+      <span class="counter-value" data-target="150">0</span>+
+    </span>
+    <span class="info-label">Activities Offered</span>
+  </div>
+</div>
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
             <div class="info-item">
               <i class="bi bi-shield-check info-icon"></i>
@@ -559,11 +573,11 @@ I cannot think of words that describe my father better.<br>
     </section>
 
     <!-- ADMISSION FORM -->
-    <section id="admissionForm" class="section admission-form-section bg-ivory">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-10">
-            <div class="form-wrapper" data-aos="fade-up">
+<section id="admissionForm" class="section admission-form-section bg-ivory">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="form-wrapper admission-form-collapsed" data-aos="fade-up">
               <div class="text-center mb-4">
                 <h2 class="section-title">Admission Application</h2>
                 <p class="text-muted">Fields marked with <span class="required">*</span> are required.</p>
@@ -699,12 +713,15 @@ I cannot think of words that describe my father better.<br>
                   <div class="invalid-feedback" id="consentError"></div>
                 </div>
 
-                <div class="text-center mt-4">
-                  <button type="submit" class="btn btn-crimson btn-lg px-5" id="submitBtn">
-                    <span class="spinner-border spinner-border-sm d-none me-2" id="submitSpinner" role="status" aria-hidden="true"></span>
-                    <span id="submitText">Submit Admission Application</span>
-                  </button>
-                </div>
+                <div class="text-center mt-4 d-flex flex-wrap gap-3 justify-content-center">
+  <button type="submit" class="btn btn-crimson btn-lg px-5" id="submitBtn">
+    <span class="spinner-border spinner-border-sm d-none me-2" id="submitSpinner" role="status" aria-hidden="true"></span>
+    <span id="submitText">Submit Admission Application</span>
+  </button>
+  <button type="button" class="btn btn-navy-outline btn-lg px-4" id="cancelAdmissionBtn">
+    Cancel
+  </button>
+</div>
               </form>
 
               <div id="successMessage" class="success-card d-none">
@@ -1211,16 +1228,16 @@ I cannot think of words that describe my father better.<br>
           <div class="col-lg-5" data-aos="fade-right">
             <div class="contact-info">
               <div class="contact-item"><i class="bi bi-geo-alt-fill"></i>
-                <div><h4>Address</h4><p>[Budgam, J&K, 191111]</p></div>
+                <div><h4>Address</h4><p>Budgam, J&K, 191111</p></div>
               </div>
               <div class="contact-item"><i class="bi bi-telephone-fill"></i>
-                <div><h4>Phone</h4><p>[+919622222723]</p></div>
+                <div><h4>Phone</h4><p>+919622222723</p></div>
               </div>
               <div class="contact-item"><i class="bi bi-envelope-fill"></i>
-                <div><h4>Email</h4><p>[genesisglobal@gmail.com]</p></div>
+                <div><h4>Email</h4><p>genesisglobalkashmir@gmail.com</p></div>
               </div>
               <div class="contact-item"><i class="bi bi-clock-fill"></i>
-                <div><h4>Office Hours</h4><p>Mon–Sat: 8:00 AM – 5:00 PM</p></div>
+                <div><h4>Office Hours</h4><p>Mon–Sat: 10:00 AM – 3:00 PM</p></div>
               </div>
             </div>
             <div class="map-placeholder mt-4">
@@ -1319,9 +1336,9 @@ I cannot think of words that describe my father better.<br>
           <div class="col-lg-3">
             <h5>Contact</h5>
             <ul class="footer-links">
-              <li><i class="bi bi-geo-alt me-2"></i>[Budgam, J&K, 191111]</li>
-              <li><i class="bi bi-telephone me-2"></i>[+919622222723]</li>
-              <li><i class="bi bi-envelope me-2"></i>[genesisglobal@gmail.com]</li>
+              <li><i class="bi bi-geo-alt me-2"></i>Budgam, J&K, 191111</li>
+              <li><i class="bi bi-telephone me-2"></i>+919622222723</li>
+              <li><i class="bi bi-envelope me-2"></i>genesisglobalkashmir@gmail.com</li>
             </ul>
             <div class="social-icons mt-3">
               <a href="https://www.facebook.com/genesisglobalacademy.org/" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
