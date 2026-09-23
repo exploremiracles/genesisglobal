@@ -428,7 +428,7 @@ img { max-width: 100%; height: auto; }
   color: rgba(255, 255, 255, 0.85);
   font-size: clamp(1rem, 2vw, 1.15rem);
   max-width: 550px;
-    height: auto;
+  height: auto;
   margin-bottom: 2rem;
 }
 
@@ -522,7 +522,7 @@ img { max-width: 100%; height: auto; }
   }
   .hero-subtitle {
     font-size: 0.85rem;
-    line-height: 1.4;
+    line-height: 1.5;
     margin-bottom: 1rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -552,6 +552,7 @@ img { max-width: 100%; height: auto; }
   }
   .hero-subtitle {
     font-size: 0.8rem;
+    line-height: 1.5;
     -webkit-line-clamp: 1;
     margin-bottom: 0.75rem;
   }
