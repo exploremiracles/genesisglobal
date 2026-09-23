@@ -525,7 +525,7 @@ img { max-width: 100%; height: auto; }
     line-height: 1.5;
     margin-bottom: 1rem;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -553,7 +553,7 @@ img { max-width: 100%; height: auto; }
   .hero-subtitle {
     font-size: 0.8rem;
     line-height: 1.5;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 4;
     margin-bottom: 0.75rem;
   }
   .hero-logo,
@@ -2762,7 +2762,7 @@ body.lightbox-open {
     font-size: 0.95rem;
   }
   .hero-title { margin-bottom: 1rem; }
-  .hero-subtitle { margin-bottom: 1.5rem; }
+  .hero-subtitle { margin-bottom: 1.5rem;-webkit-line-clamp: 4; }
 
   .cta-buttons { flex-direction: column; }
   .cta-buttons .btn { width: 100%; margin: 0 !important; }
@@ -2936,6 +2936,15 @@ body.lightbox-open {
   :root { --rail-height: 62px; }
   .hero-title { font-size: 1.75rem; }
   .section-title { font-size: 1.4rem; }
+   .hero-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .hero-logo { max-width: 140px; }
   .journal-stack { height: 170px; }
   .rail-tile { min-width: 54px; padding: 0.35rem 0.5rem; font-size: 0.5rem; }
