@@ -194,7 +194,17 @@ function updateActiveSection() {
   let currentId = '';
 
   trackedSections.forEach(section => {
-    if (section.offsetTop <= scrollY) {
+    // Skip sections that are hidden (e.g. the collapsed admission form).
+    // A hidden element reports offsetTop = 0 which would break the loop.
+    if (section.offsetParent === null && section.id !== 'admissionForm') return;
+    if (getComputedStyle(section).display === 'none') return;
+
+    // Use getBoundingClientRect for a viewport-relative position,
+    // then convert to document-relative.
+    const rect = section.getBoundingClientRect();
+    const top = rect.top + window.scrollY;
+
+    if (top <= scrollY) {
       currentId = section.id;
     }
   });
@@ -1632,6 +1642,108 @@ admissionForm.addEventListener('submit', async (e) => {
     submitText.textContent = 'Submit Admission Application';
   }
 });
+
+/* ============================================================
+   ADMISSION FORM — Reveal / Collapse
+   ============================================================
+   The admission form section is hidden by default. Clicking the
+   "Apply for Admission" button reveals it with a smooth fade+slide.
+   Clicking Cancel (or submitting successfully) collapses it back.
+============================================================ */
+(function initAdmissionFormReveal() {
+  const formSection = document.getElementById('admissionForm');
+  const formWrapper = formSection ? formSection.querySelector('.form-wrapper') : null;
+  if (!formSection || !formWrapper) return;
+
+  // All buttons that should trigger the reveal
+  // (any link pointing to #admissionForm, plus the Apply buttons in
+  //  the admissions section and CTA section)
+  const applyTriggers = document.querySelectorAll(
+    'a[href="#admissionForm"], #applyForAdmissionBtn, [data-open-admission]'
+  );
+
+  const cancelBtn = document.getElementById('cancelAdmissionBtn');
+
+  // Start hidden
+  formSection.classList.add('admission-form-hidden');
+  formWrapper.classList.remove('admission-form-open');
+  formWrapper.classList.add('admission-form-collapsed');
+
+  function openAdmissionForm() {
+    // Unhide the section first (so height can animate)
+    formSection.classList.remove('admission-form-hidden');
+
+    // Force a reflow so the browser registers the display change
+    // before we trigger the opacity/transform transition
+    void formSection.offsetHeight;
+
+    // Reveal the wrapper on the next frame for a smooth transition
+    requestAnimationFrame(() => {
+      formWrapper.classList.remove('admission-form-collapsed');
+      formWrapper.classList.add('admission-form-open');
+    });
+
+    // Smooth-scroll to the form (offset by the fixed header)
+    setTimeout(() => {
+      const headerHeight = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '68',
+        10
+      ) || 68;
+      const top = formSection.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }, 120);
+  }
+
+  function closeAdmissionForm() {
+    // Fade out first
+    formWrapper.classList.remove('admission-form-open');
+    formWrapper.classList.add('admission-form-collapsed');
+
+    // After the transition ends, hide the section so it takes no space
+    setTimeout(() => {
+      formSection.classList.add('admission-form-hidden');
+      // Scroll back to the admissions section so the user isn't left
+      // in an empty area
+      const admissionsSection = document.getElementById('admissions');
+      if (admissionsSection) {
+        const headerHeight = parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '68',
+          10
+        ) || 68;
+        const top = admissionsSection.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 480); // matches the 0.5s transition duration
+  }
+
+  // Wire up all "Apply" triggers
+  applyTriggers.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAdmissionForm();
+    });
+  });
+
+  // Wire up the Cancel button
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      // Clear validation state before hiding
+      formWrapper.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      closeAdmissionForm();
+    });
+  }
+
+  // Expose closeAdmissionForm so the submit success handler can trigger it
+  window.__closeAdmissionForm = closeAdmissionForm;
+
+  // Also close the form after a successful submission (optional)
+  // Uncomment the block below if you want the form to auto-hide
+  // after the success card is dismissed via "Back to Website".
+  //
+  // document.getElementById('backBtn')?.addEventListener('click', () => {
+  //   closeAdmissionForm();
+  // });
+})();
 
 /* ============================================================
    ADMISSION PDF DOWNLOAD
