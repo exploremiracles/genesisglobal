@@ -381,7 +381,8 @@ img { max-width: 100%; height: auto; }
 .hero-section {
   position: relative;
   min-height: calc(100vh - var(--header-height) - var(--rail-height));
-  background: url('assets/images/hero-bg.jpg') center/cover no-repeat;
+  /* background moved to .hero-media — no more url() here */
+  background-color: var(--navy); /* fallback while video/image loads */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,17 +392,76 @@ img { max-width: 100%; height: auto; }
   box-sizing: border-box;
 }
 
+/* ============================================================
+   HERO MEDIA — background video (all devices)
+============================================================ */
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--navy); /* prevents white flash before video loads */
+}
+
+.hero-media-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+}
+
+/* Accessibility: pause for reduced-motion users.
+   The poster stays visible via the video element itself. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-media-video {
+    display: none;
+  }
+  .hero-media {
+    background: var(--navy) url('poster.jpg') center/cover no-repeat;
+  }
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(1, 25, 89, 0.92) 0%, rgba(1, 25, 89, 0.75) 100%);
+  z-index: 1;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(1, 25, 89, 0.55) 0%,
+      rgba(1, 25, 89, 0.35) 50%,
+      rgba(1, 25, 89, 0.75) 100%
+    );
+  /* extra subtle vignette so text is always readable */
+  box-shadow: inset 0 0 180px 40px rgba(1, 25, 89, 0.35);
+}
+
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;   /* was 1 — now above the overlay */
+  background-image: radial-gradient(rgba(194, 183, 119, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
 }
 
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;   /* was 2 — now topmost */
   width: 100%;
   max-width: 100%;
+}
+
+.hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  z-index: 4;   /* was 3 */
 }
 
 .hero-badge {
@@ -423,6 +483,36 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 1.5rem;
   word-wrap: break-word;
 }
+/* ============================================================
+   HERO TITLE — "Light" accent
+============================================================ */
+.hero-title-accent {
+  background: linear-gradient(
+    135deg,
+    #E8DFA8 0%,
+    #C2B777 40%,
+    #9a8b4a 70%,
+    #C2B777 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* fallback */
+  position: relative;
+  display: inline-block;
+  filter: drop-shadow(0 0 18px rgba(194, 183, 119, 0.55))
+          drop-shadow(0 0 36px rgba(194, 183, 119, 0.25));
+}
+
+/* Fallback for browsers that don't support background-clip: text */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-title-accent {
+    color: var(--gold);
+    text-shadow:
+      0 0 20px rgba(194, 183, 119, 0.45),
+      0 0 40px rgba(194, 183, 119, 0.25);
+  }
+}
 
 .hero-subtitle {
   color: rgba(255, 255, 255, 0.85);
@@ -430,6 +520,15 @@ img { max-width: 100%; height: auto; }
   max-width: 550px;
   height: auto;
   margin-bottom: 2rem;
+  margin-left: auto;   /* centers on mobile */
+  margin-right: auto;
+}
+
+@media (min-width: 992px) {
+  .hero-subtitle {
+    margin-left: 0;    /* left-aligned on desktop */
+    margin-right: 0;
+  }
 }
 
 .hero-logo-wrap {
@@ -462,24 +561,51 @@ img { max-width: 100%; height: auto; }
   height: auto;
 }
 
-.hero-wave {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  z-index: 3;
-}
+
 .hero-wave svg { display: block; width: 100%; height: 80px; }
 
-.hero-particles {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(194, 183, 119, 0.15) 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: 1;
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;   /* center on mobile */
 }
 
-.hero-buttons { display: flex; flex-wrap: wrap; gap: 1rem; }
+@media (min-width: 992px) {
+  .hero-buttons {
+    justify-content: flex-start;  /* left on desktop */
+  }
+}
+
+/* ============================================================
+   HERO LAYOUT — balanced gutters on desktop
+============================================================ */
+.hero-content > .row {
+  /* Even out left/right visual weight */
+  align-items: center;
+}
+
+/* On desktop, tighten the text column and center its content vertically */
+@media (min-width: 992px) {
+  .hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Remove extra gutter asymmetry */
+  .hero-content > .row {
+    --bs-gutter-x: 2rem;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .hero-content > .row > [class*="col-"] {
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+  }
+}
 
 /* ---- Short viewport safety (split-screen, landscape phones) ----
    These override padding only to ADD MORE SPACE at the top,
@@ -1122,7 +1248,7 @@ img { max-width: 100%; height: auto; }
   padding: 1.5rem 1.5rem 1.4rem;
   border: 1px solid rgba(194, 183, 119, 0.3);
   box-shadow: 0 6px 22px rgba(1, 25, 89, 0.06);
-  transition: opacity 0.55s ease, transform 0.25s ease;
+  transition: opacity 0.3s ease, transform 0.25s ease;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   display: flex;
@@ -1145,10 +1271,14 @@ img { max-width: 100%; height: auto; }
 
 .faculty-card.hidden {
   opacity: 0;
-  transform: scale(0.95);
+  transform: scale(0.92);
   pointer-events: none;
-  position: absolute;
-  visibility: hidden;
+  /* keep the card in the grid flow for the transition, then it
+     becomes display:none once the animation ends (handled by JS) */
+}
+
+.faculty-card.hidden-after {
+  display: none;
 }
 
 .faculty-card-top {
@@ -1570,35 +1700,58 @@ img { max-width: 100%; height: auto; }
 /* ============================================================
    NEWS & EVENTS
 ============================================================ */
+/* ============================================================
+   NEWS & EVENTS — Editorial card design
+============================================================ */
+
 .news-section { background: var(--white); }
 
+/* ---- Card shell ---- */
 .news-card {
-  background: var(--white);
-  border-radius: 14px;
+  position: relative;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFAF5 100%);
+  border-radius: 18px;
   height: 100%;
-  border: 1px solid rgba(1, 25, 89, 0.06);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(194, 183, 119, 0.25);
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   flex-direction: column;
   word-wrap: break-word;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   overflow: hidden;
+  box-shadow: 0 4px 18px rgba(1, 25, 89, 0.05);
+}
+
+.news-card::before {
+  /* thin gold accent on top edge */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--crimson) 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 3;
 }
 
 .news-card:hover {
-  box-shadow: 0 12px 30px rgba(1, 25, 89, 0.08);
-  transform: translateY(-4px);
+  box-shadow: 0 18px 45px rgba(1, 25, 89, 0.14);
+  transform: translateY(-6px);
   border-color: var(--gold);
 }
 
+.news-card:hover::before { opacity: 1; }
+
+/* ---- Image ---- */
 .news-card-image-wrap {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   background: linear-gradient(135deg, #EEF0F4 0%, #F7F8FA 100%);
-  border-radius: 14px 14px 0 0;
 }
 
 .news-card-image {
@@ -1606,49 +1759,172 @@ img { max-width: 100%; height: auto; }
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .news-card:hover .news-card-image {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
+/* ---- Floating category pill ---- */
 .news-category-floating {
   position: absolute;
   top: 0.85rem;
   left: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   margin-bottom: 0 !important;
-  background: rgba(199, 0, 55, 0.92);
+  background: rgba(199, 0, 55, 0.94);
   color: var(--white);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.news-category-floating i {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* ---- Body ---- */
 .news-card-body {
-  padding: 1.5rem 1.8rem 1.8rem;
+  padding: 1.4rem 1.5rem 1.6rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 0.75rem;
 }
 
-.news-date { font-size: 0.8rem; color: var(--gray); margin-bottom: 0.5rem; }
+/* ---- Meta row (date + inline category) ---- */
+.news-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 
-.news-category {
-  display: inline-block;
+.news-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(1, 25, 89, 0.06);
+  color: var(--navy);
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(1, 25, 89, 0.08);
+}
+
+.news-date i {
+  font-size: 0.75rem;
+  color: var(--crimson);
+}
+
+/* Inline category (only shown when there's no image) */
+.news-category-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   background: rgba(199, 0, 55, 0.08);
   color: var(--crimson);
-  padding: 0.2rem 0.8rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(199, 0, 55, 0.18);
 }
 
-.news-card h4 { font-size: 1.2rem; margin-bottom: 0.6rem; line-height: 1.35; }
-.news-card p { color: var(--gray); font-size: 0.92rem; flex-grow: 1; margin: 0; }
+.news-category-inline i {
+  font-size: 0.7rem;
+}
+
+/* ---- Title ---- */
+.news-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.35;
+  letter-spacing: -0.2px;
+  transition: color 0.3s ease;
+  position: relative;
+  padding-bottom: 0.65rem;
+}
+
+.news-card-title::after {
+  /* small gold underline accent */
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 32px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.news-card:hover .news-card-title::after {
+  width: 56px;
+}
+
+.news-card:hover .news-card-title {
+  color: var(--crimson);
+}
+
+/* ---- Description ---- */
+.news-card-desc {
+  color: var(--gray);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  flex-grow: 1;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- CTA ---- */
+.news-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--crimson);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 0.35rem;
+  align-self: flex-start;
+  transition: gap 0.3s ease;
+}
+
+.news-card-cta i {
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-card-cta {
+  gap: 0.65rem;
+}
+
+.news-card:hover .news-card-cta i {
+  transform: translateX(3px);
+}
 
 .news-skeleton { pointer-events: none; }
 .skeleton-line {
@@ -2781,21 +3057,20 @@ body.lightbox-open {
   .hero-logo { max-width: 200px; }
   .hero-logo-wrap { padding: 0.5rem 0; }
 
-  .news-card-body { padding: 1rem 1rem 1.15rem; }
-  .news-card h4 { font-size: 1rem; margin-bottom: 0.4rem; }
-  .news-card p { font-size: 0.82rem; line-height: 1.5; }
-  .news-date { font-size: 0.72rem; margin-bottom: 0.35rem; }
-  .news-category,
+  .news-card-body { padding: 1.1rem 1.1rem 1.25rem; gap: 0.6rem; }
+  .news-card-title { font-size: 1rem; padding-bottom: 0.5rem; }
+  .news-card-desc { font-size: 0.82rem; line-height: 1.55; -webkit-line-clamp: 2; }
+  .news-date { font-size: 0.68rem; padding: 0.28rem 0.6rem; }
+  .news-date i { font-size: 0.7rem; }
   .news-category-floating {
-    font-size: 0.65rem;
-    padding: 0.15rem 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-  .news-category-floating {
+    font-size: 0.62rem;
+    padding: 0.28rem 0.65rem;
     top: 0.6rem;
     left: 0.6rem;
-    margin-bottom: 0;
+    letter-spacing: 0.5px;
   }
+  .news-category-inline { font-size: 0.62rem; padding: 0.28rem 0.65rem; }
+  .news-card-cta { font-size: 0.72rem; }
 
   .news-dialog { padding: 0; align-items: stretch; }
   .news-dialog-content {
@@ -2895,21 +3170,18 @@ body.lightbox-open {
   .reference-box { padding: 1rem; }
   .hero-logo { max-width: 160px; }
   .news-page-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
-  .news-card-body { padding: 0.7rem 0.65rem 0.85rem; }
-  .news-card h4 { font-size: 0.85rem; line-height: 1.25; margin-bottom: 0.3rem; }
-  .news-card p { font-size: 0.72rem; line-height: 1.45; }
-  .news-date { font-size: 0.68rem; margin-bottom: 0.3rem; }
-  .news-category,
+  .news-card-body { padding: 0.85rem 0.85rem 1rem; gap: 0.5rem; }
+  .news-card-title { font-size: 0.9rem; line-height: 1.3; }
+  .news-card-desc { font-size: 0.74rem; line-height: 1.45; -webkit-line-clamp: 2; }
+  .news-date { font-size: 0.62rem; padding: 0.22rem 0.5rem; }
+  .news-date i { font-size: 0.62rem; }
   .news-category-floating {
-    font-size: 0.6rem;
-    padding: 0.12rem 0.5rem;
-    margin-bottom: 0.4rem;
-  }
-  .news-category-floating {
+    font-size: 0.58rem;
+    padding: 0.22rem 0.55rem;
     top: 0.5rem;
     left: 0.5rem;
-    margin-bottom: 0;
   }
+  .news-card-cta { font-size: 0.66rem; }
   .news-card-image-wrap { aspect-ratio: 16 / 10; }
   .news-page-num { width: 34px; height: 34px; font-size: 0.8rem; }
   .review-form-wrapper { padding: 1.5rem 1rem; }
@@ -2936,15 +3208,6 @@ body.lightbox-open {
   :root { --rail-height: 62px; }
   .hero-title { font-size: 1.75rem; }
   .section-title { font-size: 1.4rem; }
-   .hero-subtitle {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
   .hero-logo { max-width: 140px; }
   .journal-stack { height: 170px; }
   .rail-tile { min-width: 54px; padding: 0.35rem 0.5rem; font-size: 0.5rem; }
