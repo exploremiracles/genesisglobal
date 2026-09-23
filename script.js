@@ -9,7 +9,8 @@
    - News & Events (paginated 5/page, full-screen dialog)
    - Reviews (public submission + admin-approval gated display)
    - Faculty Directory (name + role + contact number)
-   - Admission form submission
+   - Downloads Journal (filterable, paginated, live)
+   - Admission form submission + PDF download
    - Contact form submission
    - Gallery journal + unified lightbox
 ============================================================ */
@@ -17,7 +18,6 @@
 /* ============================================================
    FIREBASE CONFIG — REPLACE WITH YOUR OWN
 ============================================================ */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDHCpn9yfi7jgYrAMu2q1DLXVm9hjJNBxo",
   authDomain: "genesiskashmir.firebaseapp.com",
@@ -110,6 +110,24 @@ function formatDate(value) {
 }
 
 /* ============================================================
+   FIRESTORE SUBSCRIPTION RETRY HELPER
+   ============================================================
+   Every section that subscribes to Firestore registers a retry
+   callback here. If the subscription errors, we retry after
+   a delay so transient network issues self-heal without a
+   page refresh.
+============================================================ */
+window.__firestoreRetryTimers = window.__firestoreRetryTimers || {};
+
+function scheduleRetry(key, fn, delayMs = 10000) {
+  clearTimeout(window.__firestoreRetryTimers[key]);
+  window.__firestoreRetryTimers[key] = setTimeout(() => {
+    console.log(`[Firestore] Retrying subscription: ${key}`);
+    try { fn(); } catch (e) { console.warn('[Firestore] Retry threw:', e); }
+  }, delayMs);
+}
+
+/* ============================================================
    GLOBAL — Suppress double-tap-to-zoom
 ============================================================ */
 (function disableDoubleTapZoom() {
@@ -186,7 +204,11 @@ function updateActiveSection() {
   });
 }
 
-window.addEventListener('scroll', updateActiveSection, { passive: true });
+let activeSectionTimer;
+window.addEventListener('scroll', () => {
+  clearTimeout(activeSectionTimer);
+  activeSectionTimer = setTimeout(updateActiveSection, 100);
+}, { passive: true });
 updateActiveSection();
 
 /* Auto-scroll the rail horizontally to keep active tile centered on small screens */
@@ -208,6 +230,7 @@ function scrollRailToActive() {
   });
 }
 window.addEventListener('scroll', () => {
+  if (!sectionRail || sectionRail.scrollWidth <= sectionRail.clientWidth) return;
   clearTimeout(window.__railScrollTimeout);
   window.__railScrollTimeout = setTimeout(scrollRailToActive, 120);
 }, { passive: true });
@@ -259,7 +282,6 @@ const facultyData = [
   { name: "Mr. Ghulam Hassan Mir", role: "VP", dept: "leadership", deptLabel: "Leadership", phone: "+919906670378" },
   { name: "Jabeena Mehdi", role: "AO", dept: "management", deptLabel: "Management", phone: "+919906852216" },
   { name: "Ahtisham Hussain", role: "Transport Head", dept: "management", deptLabel: "Management", phone: "+916006020208" }
-
 ];
 
 const facultyGrid = document.getElementById('facultyGrid');
@@ -439,6 +461,21 @@ function renderNewsPage(page) {
 }
 
 function renderNews(items) {
+  const previousPage = currentNewsPage;
+  allNewsItems = items || [];
+
+  if (previousPage > 0 && allNewsItems.length > 0) {
+    const maxPage = Math.ceil(allNewsItems.length / NEWS_PER_PAGE);
+    const safePage = Math.min(previousPage, maxPage);
+    currentNewsPage = safePage;
+    renderNewsPage(safePage);
+  } else {
+    currentNewsPage = 1;
+    renderNewsPage(1);
+  }
+}
+
+function resetNewsPage(items) {
   allNewsItems = items || [];
   currentNewsPage = 1;
   renderNewsPage(1);
@@ -512,7 +549,7 @@ function initNews() {
   const timeoutId = setTimeout(() => {
     if (!hasReceivedData) {
       console.warn('Firestore news fetch timed out.');
-      renderNews([]);
+      resetNewsPage([]);
       newsErrorState.classList.remove('d-none');
     }
   }, 10000);
@@ -523,9 +560,10 @@ function initNews() {
       (snapshot) => {
         hasReceivedData = true;
         clearTimeout(timeoutId);
+        newsErrorState.classList.add('d-none');
 
         if (snapshot.empty) {
-          renderNews([]);
+          resetNewsPage([]);
           return;
         }
 
@@ -540,7 +578,7 @@ function initNews() {
 
         db.collection('news').get()
           .then(snapshot => {
-            if (snapshot.empty) { renderNews([]); return; }
+            if (snapshot.empty) { resetNewsPage([]); return; }
             const items = [];
             snapshot.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
             items.sort((a, b) => {
@@ -548,13 +586,16 @@ function initNews() {
               const bo = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
               return ao - bo;
             });
-            renderNews(items);
+            resetNewsPage(items);
           })
           .catch(err => {
             console.error('Firestore news fallback failed:', err);
-            renderNews([]);
+            resetNewsPage([]);
             newsErrorState.classList.remove('d-none');
           });
+
+        // Auto-retry after 10 seconds so transient failures self-heal
+        scheduleRetry('news', () => initNews(), 10000);
       }
     );
 }
@@ -562,7 +603,6 @@ initNews();
 
 /* ============================================================
    REVIEWS — only approved reviews are publicly readable
-   (Firestore rules block unapproved docs from read)
 ============================================================ */
 const REVIEWS_PER_PAGE = 5;
 
@@ -752,9 +792,18 @@ function renderReviewsPage(page) {
 }
 
 function renderReviews(items) {
+  const previousPage = currentReviewsPage;
   allReviewItems = items || [];
-  currentReviewsPage = 1;
-  renderReviewsPage(1);
+
+  if (previousPage > 0 && allReviewItems.length > 0) {
+    const maxPage = Math.ceil(allReviewItems.length / REVIEWS_PER_PAGE);
+    const safePage = Math.min(previousPage, maxPage);
+    currentReviewsPage = safePage;
+    renderReviewsPage(safePage);
+  } else {
+    currentReviewsPage = 1;
+    renderReviewsPage(1);
+  }
 }
 
 reviewsPrevBtn.addEventListener('click', () => {
@@ -775,13 +824,17 @@ function initReviews() {
     }
   }, 10000);
 
-  // Only fetch reviews where approved == true
+  // Only fetch approved reviews, capped at 50 most recent.
+  // This keeps the payload light even as the review count grows.
   db.collection('reviews')
     .where('approved', '==', true)
+    .orderBy('createdAt', 'desc')
+    .limit(50)
     .onSnapshot(
       (snapshot) => {
         hasReceivedData = true;
         clearTimeout(timeoutId);
+        reviewsErrorState.classList.add('d-none');
 
         if (snapshot.empty) {
           renderReviews([]);
@@ -790,22 +843,38 @@ function initReviews() {
 
         const items = [];
         snapshot.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
-
-        // Sort by createdAt desc on the client
-        items.sort((a, b) => {
-          const at = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate().getTime() : 0;
-          const bt = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate().getTime() : 0;
-          return bt - at;
-        });
-
+        // Firestore already sorted by createdAt desc — no client-side sort needed
         console.log(`✅ Loaded ${items.length} approved reviews`);
         renderReviews(items);
       },
       (error) => {
         clearTimeout(timeoutId);
         console.error('Firestore reviews error:', error);
-        renderReviews([]);
-        reviewsErrorState.classList.remove('d-none');
+
+        // Fallback: try without orderBy in case the composite index
+        // (approved + createdAt) hasn't been created yet.
+        db.collection('reviews')
+          .where('approved', '==', true)
+          .limit(50)
+          .get()
+          .then(snapshot => {
+            const items = [];
+            snapshot.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
+            items.sort((a, b) => {
+              const at = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate().getTime() : 0;
+              const bt = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate().getTime() : 0;
+              return bt - at;
+            });
+            renderReviews(items);
+          })
+          .catch(err => {
+            console.error('Firestore reviews fallback failed:', err);
+            renderReviews([]);
+            reviewsErrorState.classList.remove('d-none');
+          });
+
+        // Auto-retry after 10 seconds so transient failures self-heal
+        scheduleRetry('reviews', () => initReviews(), 10000);
       }
     );
 }
@@ -856,14 +925,17 @@ function validateReviewForm() {
 reviewForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (reviewSubmitting) return;
-  if (!validateReviewForm()) return;
-
   reviewSubmitting = true;
+
+  if (!validateReviewForm()) {
+    reviewSubmitting = false;
+    return;
+  }
+
   reviewSubmitBtn.disabled = true;
   reviewSpinner.classList.remove('d-none');
   reviewSubmitText.textContent = 'Submitting...';
 
-  // Cap role to 100 characters (matches Firestore rule)
   const roleValue = document.getElementById('reviewRole').value.trim().slice(0, 100);
 
   const reviewData = {
@@ -871,7 +943,7 @@ reviewForm.addEventListener('submit', async (e) => {
     role: roleValue,
     rating: parseInt(reviewStarsInput.value, 10) || 0,
     message: document.getElementById('reviewMessage').value.trim().slice(0, 1000),
-    approved: false, // Requires admin approval before appearing publicly
+    approved: false,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
@@ -914,33 +986,9 @@ document.getElementById('reviewAgainBtn')?.addEventListener('click', () => {
 
 highlightStars(0);
 
-
-
-
 /* ============================================================
    DOWNLOADS JOURNAL — Firestore, filterable, paginated
-   ============================================================
-   Firestore document structure for /downloads/{docId}:
-
-   {
-     title: "Class 5 Maths Syllabus",
-     description: "Complete syllabus for Class 5 Mathematics.",
-     category: "Syllabus",
-     class: "class5",
-     classLabel: "Class 5",
-     type: "pdf",
-     url: "https://example.com/class5-maths.pdf",
-     fileSize: "1.2 MB",
-     order: 1
-   }
-
-   Rules:
-   match /downloads/{docId} {
-     allow read: if true;
-     allow write: if isAdmin();
-   }
 ============================================================ */
-
 const DOWNLOADS_PER_PAGE = 6;
 
 const downloadsGrid = document.getElementById('downloadsGrid');
@@ -957,7 +1005,6 @@ let filteredDownloadItems = [];
 let currentDownloadsPage = 1;
 let activeDownloadClass = 'all';
 
-/* Map file type → Bootstrap icon + label */
 function downloadIconFor(type) {
   switch ((type || '').toLowerCase()) {
     case 'pdf': return { icon: 'bi-file-earmark-pdf-fill', label: 'PDF' };
@@ -1010,7 +1057,6 @@ function buildDownloadCard(item) {
   return card;
 }
 
-/* ---------- Filter with page preservation ---------- */
 function applyDownloadsFilter(preservePage = false) {
   const previousPage = currentDownloadsPage;
 
@@ -1071,7 +1117,6 @@ downloadsNextBtn.addEventListener('click', () => {
   if (currentDownloadsPage < totalPages) renderDownloadsPage(currentDownloadsPage + 1);
 });
 
-/* ---------- Filter chip clicks ---------- */
 downloadFilters.forEach(btn => {
   btn.addEventListener('click', () => {
     downloadFilters.forEach(b => {
@@ -1081,11 +1126,10 @@ downloadFilters.forEach(btn => {
     btn.classList.add('active');
     btn.setAttribute('aria-selected', 'true');
     activeDownloadClass = btn.dataset.class || 'all';
-    applyDownloadsFilter(false);   // reset to page 1 on filter change
+    applyDownloadsFilter(false);
   });
 });
 
-/* ---------- Firestore live subscription ---------- */
 function initDownloads() {
   let hasReceivedData = false;
   const timeoutId = setTimeout(() => {
@@ -1103,6 +1147,7 @@ function initDownloads() {
       (snapshot) => {
         hasReceivedData = true;
         clearTimeout(timeoutId);
+        downloadsErrorState.classList.add('d-none');
 
         const items = [];
         snapshot.forEach(doc => {
@@ -1114,7 +1159,7 @@ function initDownloads() {
 
         console.log(`✅ Loaded ${items.length} downloads`);
         allDownloadItems = items;
-        applyDownloadsFilter(true);   // preserve page on live updates
+        applyDownloadsFilter(true);
       },
       (error) => {
         clearTimeout(timeoutId);
@@ -1143,6 +1188,8 @@ function initDownloads() {
             applyDownloadsFilter(false);
             downloadsErrorState.classList.remove('d-none');
           });
+
+        scheduleRetry('downloads', () => initDownloads(), 10000);
       }
     );
 }
@@ -1339,6 +1386,14 @@ function updateLightboxImage() {
   if (lightboxCounter) {
     lightboxCounter.textContent = `${lightboxIndex + 1} / ${lightboxItems.length}`;
   }
+
+  // Preload neighbors so Next/Prev is instant
+  if (lightboxItems.length > 1) {
+    const nextItem = lightboxItems[(lightboxIndex + 1) % lightboxItems.length];
+    const prevItem = lightboxItems[(lightboxIndex - 1 + lightboxItems.length) % lightboxItems.length];
+    if (nextItem && nextItem.src) new Image().src = nextItem.src;
+    if (prevItem && prevItem.src) new Image().src = prevItem.src;
+  }
 }
 
 function closeLightbox() {
@@ -1514,9 +1569,13 @@ document.querySelectorAll('#admissionFormElement input, #admissionFormElement se
 admissionForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (admissionSubmitting) return;
-  if (!validateAdmissionForm()) return;
-
   admissionSubmitting = true;
+
+  if (!validateAdmissionForm()) {
+    admissionSubmitting = false;
+    return;
+  }
+
   submitBtn.disabled = true;
   submitSpinner.classList.remove('d-none');
   submitText.textContent = 'Submitting...';
@@ -1576,45 +1635,58 @@ admissionForm.addEventListener('submit', async (e) => {
 
 /* ============================================================
    ADMISSION PDF DOWNLOAD
-   Generates a clean PDF with all submitted admission details.
 ============================================================ */
-document.getElementById('printBtn')?.addEventListener('click', () => {
+/* ============================================================
+   ADMISSION PDF DOWNLOAD (lazy-loads jsPDF on first click)
+============================================================ */
+document.getElementById('printBtn')?.addEventListener('click', async () => {
   try {
+    // Lazy-load jsPDF on first use to keep initial page weight light
+    if (!window.jspdf) {
+      try {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      } catch (loadErr) {
+        console.error('jsPDF failed to load:', loadErr);
+        alert('Could not load the PDF library. Please check your connection and try again.');
+        return;
+      }
+    }
+
     const { jsPDF } = window.jspdf;
     if (!jsPDF) {
-      alert('PDF library failed to load. Please refresh the page and try again.');
+      alert('PDF library unavailable. Please refresh and try again.');
       return;
     }
 
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
 
-    // Colors
     const navy = [1, 25, 89];
     const crimson = [199, 0, 55];
     const gold = [194, 183, 119];
     const gray = [107, 114, 128];
 
-    // Page dimensions
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 40;
     let y = margin;
 
-    // ---------- Header band ----------
     doc.setFillColor(navy[0], navy[1], navy[2]);
     doc.rect(0, 0, pageWidth, 90, 'F');
 
-    // Gold accent line
     doc.setFillColor(gold[0], gold[1], gold[2]);
     doc.rect(0, 90, pageWidth, 3, 'F');
 
-    // School name
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.text('Genesis Global Academy', margin, 40);
 
-    // Subtitle
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(194, 183, 119);
@@ -1622,7 +1694,6 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
 
     y = 120;
 
-    // ---------- Reference badge ----------
     const refId = document.getElementById('refId').textContent || '';
     const refDate = document.getElementById('refDate').textContent || '';
 
@@ -1649,9 +1720,7 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
 
     y += 80;
 
-    // ---------- Helper to draw sections ----------
     function drawSection(title, rows) {
-      // Section title with gold underline
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(navy[0], navy[1], navy[2]);
@@ -1662,7 +1731,6 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
 
       y += 22;
 
-      // Rows
       doc.setFontSize(10);
       rows.forEach(([label, value]) => {
         if (y > pageHeight - 60) {
@@ -1670,16 +1738,13 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
           y = margin;
         }
 
-        // Label column
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(gray[0], gray[1], gray[2]);
         doc.text(label, margin, y);
 
-        // Value column
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(17, 24, 39);
 
-        // Wrap long values
         const valueText = value || '—';
         const maxValueWidth = pageWidth - margin * 2 - 160;
         const lines = doc.splitTextToSize(valueText, maxValueWidth);
@@ -1691,13 +1756,11 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
       y += 12;
     }
 
-    // ---------- Pull form values ----------
     const getVal = (id) => {
       const el = document.getElementById(id);
       return el && el.value ? el.value.trim() : '';
     };
 
-    // ---------- Sections ----------
     drawSection('STUDENT INFORMATION', [
       ['Student Name',   getVal('studentName')],
       ['Date of Birth',  getVal('dateOfBirth')],
@@ -1731,7 +1794,6 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
       ['Message / Notes',     getVal('additionalInformation')]
     ]);
 
-    // ---------- Footer ----------
     const footerY = pageHeight - 50;
 
     doc.setDrawColor(194, 183, 119);
@@ -1757,7 +1819,6 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
       { align: 'right' }
     );
 
-    // ---------- Save ----------
     const fileName = `Admission_${(getVal('studentName') || 'Application').replace(/\s+/g, '_')}_${refId.slice(-8) || 'GGA'}.pdf`;
     doc.save(fileName);
 
@@ -1768,6 +1829,7 @@ document.getElementById('printBtn')?.addEventListener('click', () => {
     alert('Could not generate PDF. Please try again.');
   }
 });
+
 document.getElementById('backBtn')?.addEventListener('click', () => {
   successMessage.classList.add('d-none');
   admissionForm.classList.remove('d-none');
@@ -1810,7 +1872,6 @@ function validateContactForm() {
   else if (!validateEmail(email)) { showContactError('contactEmail', 'Enter a valid email address.'); isValid = false; }
   else clearContactError('contactEmail');
 
-  // Optional phone: only validate if something was entered
   const phone = document.getElementById('contactPhone').value.trim();
   if (phone && (phone.length < 7 || phone.length > 20 || !/^[0-9+\-\s()]+$/.test(phone))) {
     showContactError('contactPhone', 'Enter a valid phone number (7–20 digits).');
@@ -1839,9 +1900,13 @@ document.querySelectorAll('#contactForm input, #contactForm textarea').forEach(e
 contactForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (contactSubmitting) return;
-  if (!validateContactForm()) return;
-
   contactSubmitting = true;
+
+  if (!validateContactForm()) {
+    contactSubmitting = false;
+    return;
+  }
+
   contactSubmitBtn.disabled = true;
   contactSpinner.classList.remove('d-none');
   contactSubmitText.textContent = 'Sending...';
@@ -1896,12 +1961,10 @@ window.addEventListener('resize', () => {
   }, 200);
 });
 
-
 /* ============================================================
    PWA — Service Worker Registration + Install Prompt
-   ============================================================ */
+============================================================ */
 (function initPWA() {
-  // Bail out if service workers aren't supported
   if (!('serviceWorker' in navigator)) {
     console.log('[PWA] Service Worker not supported');
     return;
@@ -1910,7 +1973,6 @@ window.addEventListener('resize', () => {
   let deferredInstallPrompt = null;
   let registration = null;
 
-  /* ---------- Register the service worker ---------- */
   window.addEventListener('load', async () => {
     try {
       registration = await navigator.serviceWorker.register('/sw.js', {
@@ -1918,12 +1980,10 @@ window.addEventListener('resize', () => {
       });
       console.log('[PWA] Service Worker registered:', registration.scope);
 
-      // Check for updates every hour
       setInterval(() => {
         registration.update().catch(() => {});
       }, 60 * 60 * 1000);
 
-      // Detect when a new SW has been installed and is waiting
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (!newWorker) return;
@@ -1940,7 +2000,6 @@ window.addEventListener('resize', () => {
     }
   });
 
-  /* ---------- Handle service worker updates from the page ---------- */
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return;
@@ -1949,21 +2008,18 @@ window.addEventListener('resize', () => {
   });
 
   function showUpdateBanner(worker) {
-  // Update banner disabled — the service worker auto-updates silently
-  // as soon as a new version is deployed.
-  if (worker) {
-    worker.postMessage({ type: 'SKIP_WAITING' });
+    // Update banner disabled — service worker auto-updates silently
+    if (worker) {
+      worker.postMessage({ type: 'SKIP_WAITING' });
+    }
   }
-}
 
-  /* ---------- Install prompt (Android/Chrome/Edge) ---------- */
   const installBanner = document.getElementById('pwaInstallBanner');
   const installBtn = document.getElementById('pwaInstallBtn');
   const installClose = document.getElementById('pwaInstallClose');
 
-  // Don't show if the user already dismissed it recently
   const DISMISS_KEY = 'wol_pwa_dismissed_at';
-  const DISMISS_TTL = 1000 * 60 * 60 * 24 * 7; // 7 days
+  const DISMISS_TTL = 1000 * 60 * 60 * 24 * 7;
 
   function wasRecentlyDismissed() {
     try {
@@ -1980,20 +2036,17 @@ window.addEventListener('resize', () => {
     } catch (e) {}
   }
 
-  // Don't show if already running as an installed app
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches
       || window.navigator.standalone === true;
   }
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing
     e.preventDefault();
     deferredInstallPrompt = e;
 
     if (isStandalone() || wasRecentlyDismissed()) return;
 
-    // Show our custom banner after a short delay
     setTimeout(() => {
       if (installBanner) installBanner.classList.remove('d-none');
     }, 4000);
@@ -2017,15 +2070,12 @@ window.addEventListener('resize', () => {
     });
   }
 
-  // Hide banner once installed
   window.addEventListener('appinstalled', () => {
     console.log('[PWA] App installed');
     if (installBanner) installBanner.classList.add('d-none');
     deferredInstallPrompt = null;
   });
 
-  /* ---------- iOS manual instructions ---------- */
-  // iOS doesn't support beforeinstallprompt. Show a one-time hint.
   function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   }
@@ -2035,7 +2085,6 @@ window.addEventListener('resize', () => {
   }
 
   if (isIOS() && isSafari() && !isStandalone() && !wasRecentlyDismissed()) {
-    // Show a subtle banner with iOS-specific instructions
     setTimeout(() => {
       if (installBanner) {
         const textEl = installBanner.querySelector('.pwa-install-text span');
