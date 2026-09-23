@@ -8,7 +8,7 @@
    - Fallback to offline.html when the network is unavailable
 ============================================================ */
 
-const CACHE_VERSION = 'wol-v1.0.50';
+const CACHE_VERSION = 'wol-v1.0.51';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
