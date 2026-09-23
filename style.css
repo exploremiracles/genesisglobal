@@ -77,8 +77,6 @@ img { max-width: 100%; height: auto; }
 .section-subtitle { max-width: 600px; color: var(--gray); }
 .required { color: var(--crimson); }
 
-
-
 /* ============================================================
    BUTTONS
 ============================================================ */
@@ -244,7 +242,7 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   BOTTOM SECTION RAIL — always visible on ALL devices
+   BOTTOM SECTION RAIL
 ============================================================ */
 .section-rail {
   position: fixed;
@@ -376,6 +374,9 @@ img { max-width: 100%; height: auto; }
 
 /* ============================================================
    HERO
+   ============================================================
+   Consolidated hero rules. All short-viewport handling is
+   in one place so the header offset is never overridden.
 ============================================================ */
 .hero-section {
   position: relative;
@@ -383,15 +384,26 @@ img { max-width: 100%; height: auto; }
   background: url('assets/images/hero-bg.jpg') center/cover no-repeat;
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
   width: 100%;
+  padding: calc(var(--header-height) + 1.5rem) 0 6rem;
+  box-sizing: border-box;
 }
+
 .hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(1, 25, 89, 0.92) 0%, rgba(1, 25, 89, 0.75) 100%);
 }
-.hero-content { position: relative; z-index: 2; width: 100%; }
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+}
+
 .hero-badge {
   display: inline-block;
   background: rgba(194, 183, 119, 0.2);
@@ -402,6 +414,7 @@ img { max-width: 100%; height: auto; }
   font-size: 0.85rem;
   font-weight: 600;
 }
+
 .hero-title {
   font-size: clamp(2rem, 5vw, 3.6rem);
   font-weight: 800;
@@ -410,12 +423,14 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 1.5rem;
   word-wrap: break-word;
 }
+
 .hero-subtitle {
   color: rgba(255, 255, 255, 0.85);
   font-size: clamp(1rem, 2vw, 1.15rem);
   max-width: 550px;
   margin-bottom: 2rem;
 }
+
 .hero-logo-wrap {
   display: flex;
   justify-content: center;
@@ -423,14 +438,38 @@ img { max-width: 100%; height: auto; }
   width: 100%;
   padding: 1rem 0;
 }
+
 .hero-logo {
   max-width: 300px;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.35));
 }
-.hero-wave { position: absolute; bottom: -1px; left: 0; width: 100%; z-index: 3; }
+
+/* Mobile-only logo container */
+.hero-logo-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0 1rem;
+}
+
+.hero-logo-mobile .hero-logo {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+}
+
+.hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+}
 .hero-wave svg { display: block; width: 100%; height: 80px; }
+
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -438,7 +477,90 @@ img { max-width: 100%; height: auto; }
   background-size: 40px 40px;
   z-index: 1;
 }
+
 .hero-buttons { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+/* ---- Short viewport safety (split-screen, landscape phones) ----
+   These override padding only to ADD MORE SPACE at the top,
+   never less than the header. The header offset is preserved.
+   ------------------------------------------------------------- */
+@media (max-height: 720px) {
+  .hero-section {
+    min-height: auto;
+    /* keep header offset + reduce bottom breathing room */
+    padding: calc(var(--header-height) + 1.25rem) 0 4rem;
+    align-items: flex-start;
+  }
+  .hero-title {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    margin-bottom: 1rem;
+  }
+  .hero-subtitle { margin-bottom: 1.25rem; }
+  .hero-buttons { flex-wrap: wrap; gap: 0.75rem;}
+  .hero-buttons .btn {
+    padding: 0.55rem 1.25rem;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .hero-section {
+    min-height: auto;
+    padding: calc(var(--header-height) + 1rem) 0 4rem;
+    align-items: flex-start;
+  }
+  .hero-badge {
+    font-size: 0.72rem;
+    padding: 0.28rem 0.75rem;
+    margin-bottom: 0.6rem !important;
+  }
+  .hero-title {
+    font-size: clamp(1.35rem, 4vw, 1.9rem);
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+  .hero-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-logo-wrap { padding: 0.25rem 0; }
+  .hero-logo { max-width: 130px; }
+  .hero-logo-mobile .hero-logo { max-width: 110px; }
+  .hero-buttons { gap: 0.5rem; }
+  .hero-buttons .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-height: 480px) {
+  .hero-section {
+    min-height: auto;
+    padding: calc(var(--header-height) + 0.75rem) 0 2rem;
+    align-items: flex-start;
+  }
+  .hero-badge { display: none; }
+  .hero-title {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-subtitle {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 1;
+    margin-bottom: 0.75rem;
+  }
+  .hero-logo,
+  .hero-logo-mobile .hero-logo { max-width: 90px; }
+  .hero-buttons .btn {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+  }
+}
 
 /* ============================================================
    INFO STRIP
@@ -515,7 +637,7 @@ img { max-width: 100%; height: auto; }
 .mv-item p { color: var(--gray); font-size: 0.95rem; margin: 0; }
 
 /* ============================================================
-   FOUNDER'S MESSAGE SECTION
+   FOUNDER'S MESSAGE
 ============================================================ */
 .founder-section {
   background: linear-gradient(180deg, #FFFFFF 0%, #F8F7F2 100%);
@@ -544,9 +666,7 @@ img { max-width: 100%; height: auto; }
 
 .founder-topline {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 5px;
   background: linear-gradient(90deg, var(--gold) 0%, var(--crimson) 100%);
 }
@@ -903,6 +1023,40 @@ img { max-width: 100%; height: auto; }
   max-width: 100%;
 }
 .reference-box p { margin: 0.3rem 0; word-wrap: break-word; }
+
+/* ============================================================
+   ADMISSION FORM — Collapsible reveal
+   ============================================================
+   The form starts collapsed (zero height, invisible, no padding).
+   When the Apply button is clicked, JS adds `.admission-form-open`
+   to the wrapper, which smoothly expands it.
+============================================================ */
+
+/* Collapsed state — the form section itself is hidden */
+.admission-form-section.admission-form-hidden {
+  display: none;
+}
+
+/* Form wrapper animations */
+.form-wrapper {
+  transition: opacity 0.5s ease,
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+/* Pre-reveal state — invisible and slightly shifted down */
+.form-wrapper.admission-form-collapsed {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+
+/* Revealed state — fully visible and in place */
+.form-wrapper.admission-form-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 
 /* ============================================================
    FACULTY
@@ -1705,7 +1859,7 @@ img { max-width: 100%; height: auto; }
 .review-skeleton { pointer-events: none; }
 
 /* ============================================================
-   DOWNLOADS JOURNAL — Library-style resource center
+   DOWNLOADS JOURNAL
 ============================================================ */
 .downloads-section {
   background: linear-gradient(180deg, #FFFFFF 0%, #F8F7F2 100%);
@@ -1722,7 +1876,6 @@ img { max-width: 100%; height: auto; }
   pointer-events: none;
 }
 
-/* ---------- Class filter chips ---------- */
 .downloads-filters {
   display: flex;
   flex-wrap: wrap;
@@ -1774,7 +1927,6 @@ img { max-width: 100%; height: auto; }
   color: var(--gold);
 }
 
-/* ---------- Grid ---------- */
 .downloads-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -1785,7 +1937,6 @@ img { max-width: 100%; height: auto; }
   z-index: 2;
 }
 
-/* ---------- Resource card ---------- */
 .download-card {
   position: relative;
   display: flex;
@@ -1822,7 +1973,6 @@ img { max-width: 100%; height: auto; }
   display: none;
 }
 
-/* Icon by file type */
 .download-card-icon {
   width: 52px;
   height: 52px;
@@ -1843,7 +1993,6 @@ img { max-width: 100%; height: auto; }
   transform: scale(1.08) rotate(-3deg);
 }
 
-/* File type variations */
 .download-card[data-type="pdf"] .download-card-icon {
   background: linear-gradient(135deg, #C70037 0%, #a5002e 100%);
   color: var(--white);
@@ -1869,7 +2018,6 @@ img { max-width: 100%; height: auto; }
   color: var(--white);
 }
 
-/* Category badge */
 .download-card-category {
   display: inline-block;
   font-size: 0.68rem;
@@ -1906,7 +2054,6 @@ img { max-width: 100%; height: auto; }
   overflow: hidden;
 }
 
-/* Footer: file info + action */
 .download-card-footer {
   display: flex;
   align-items: center;
@@ -1963,16 +2110,13 @@ img { max-width: 100%; height: auto; }
   box-shadow: 0 6px 16px rgba(199, 0, 55, 0.35);
 }
 
-/* Skeleton state */
 .download-skeleton {
   pointer-events: none;
   min-height: 220px;
 }
 
-/* ---------- Responsive: 2 per row on mobile ---------- */
 @media (max-width: 767.98px) {
-
-    .downloads-filters {
+  .downloads-filters {
     flex-wrap: nowrap;
     overflow-x: auto;
     justify-content: flex-start;
@@ -2094,6 +2238,7 @@ img { max-width: 100%; height: auto; }
   .download-card-title { font-size: 0.8rem; }
   .download-card-desc { font-size: 0.66rem; }
 }
+
 /* ============================================================
    NEWS DIALOG
 ============================================================ */
@@ -2156,7 +2301,6 @@ img { max-width: 100%; height: auto; }
   flex: 1;
 }
 
-/* News dialog hero image */
 .news-dialog-hero {
   width: 100%;
   border-radius: 14px;
@@ -2306,7 +2450,7 @@ img { max-width: 100%; height: auto; }
 .footer-bottom a:hover { color: var(--gold); }
 
 /* ============================================================
-   SCROLL TOP — sits above the bottom rail
+   SCROLL TOP
 ============================================================ */
 .scroll-top-btn {
   position: fixed;
@@ -2584,9 +2728,8 @@ body.lightbox-open {
   .rail-tile { padding: 0.45rem 0.7rem; min-width: 62px; font-size: 0.6rem; }
   .rail-icon { width: 30px; height: 30px; font-size: 0.9rem; }
 
-  /* Founder responsive */
   .founder-card { padding: 2.5rem 2rem 2rem; }
-  .founder-photo-wrap { width: 160px; height: 160px; }
+  .founder-photo-wrap { width: 180px; height: 180px; }
   .founder-quote { font-size: 1rem; }
 }
 
@@ -2604,15 +2747,28 @@ body.lightbox-open {
   .btn-header-cta i { margin-right: 0 !important; font-size: 1rem; }
 
   .section { padding: 55px 0; }
-  .hero-section { min-height: auto; padding: 100px 0 60px; }
-  .hero-buttons { flex-direction: column; }
-  .hero-buttons .btn { width: 100%; margin: 0 !important; }
+
+  /* Hero on mobile — uses header offset via var so it always clears it */
+  .hero-section {
+    min-height: auto;
+    padding: calc(var(--header-height) + 1.5rem) 0 4rem;
+    align-items: flex-start;
+  }
+  .hero-buttons { gap: 0.75rem; }
+  .hero-buttons .btn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
+  .hero-title { margin-bottom: 1rem; }
+  .hero-subtitle { margin-bottom: 1.5rem; }
+
   .cta-buttons { flex-direction: column; }
   .cta-buttons .btn { width: 100%; margin: 0 !important; }
   .form-wrapper { padding: 1.5rem 1rem; border-radius: 14px; }
   .admission-info-card { padding: 1.5rem; }
   .about-decorative-line { display: none; }
-    .campus-card { height: 180px; }
+
+  .campus-card { height: 180px; }
   .campus-label {
     padding: 0.6rem 0.7rem;
     font-size: 0.82rem;
@@ -2623,33 +2779,22 @@ body.lightbox-open {
   .hero-logo { max-width: 200px; }
   .hero-logo-wrap { padding: 0.5rem 0; }
 
-  /* News card — mobile 2-column layout */
-.news-card-body {
-  padding: 1rem 1rem 1.15rem;
-}
-.news-card h4 {
-  font-size: 1rem;
-  margin-bottom: 0.4rem;
-}
-.news-card p {
-  font-size: 0.82rem;
-  line-height: 1.5;
-}
-.news-date {
-  font-size: 0.72rem;
-  margin-bottom: 0.35rem;
-}
-.news-category,
-.news-category-floating {
-  font-size: 0.65rem;
-  padding: 0.15rem 0.6rem;
-  margin-bottom: 0.5rem;
-}
-.news-category-floating {
-  top: 0.6rem;
-  left: 0.6rem;
-  margin-bottom: 0;
-}
+  .news-card-body { padding: 1rem 1rem 1.15rem; }
+  .news-card h4 { font-size: 1rem; margin-bottom: 0.4rem; }
+  .news-card p { font-size: 0.82rem; line-height: 1.5; }
+  .news-date { font-size: 0.72rem; margin-bottom: 0.35rem; }
+  .news-category,
+  .news-category-floating {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .news-category-floating {
+    top: 0.6rem;
+    left: 0.6rem;
+    margin-bottom: 0;
+  }
+
   .news-dialog { padding: 0; align-items: stretch; }
   .news-dialog-content {
     border-radius: 0;
@@ -2700,9 +2845,8 @@ body.lightbox-open {
   .rail-icon { width: 28px; height: 28px; font-size: 0.85rem; border-radius: 8px; }
   .section-rail { padding: 0.4rem 0.3rem calc(0.4rem + env(safe-area-inset-bottom, 0)); }
 
-  /* Founder responsive */
   .founder-card { padding: 2rem 1.25rem 1.75rem; border-radius: 20px; }
-  .founder-photo-wrap { width: 140px; height: 140px; }
+  .founder-photo-wrap { width: 160px; height: 160px; }
   .founder-quote {
     font-size: 0.95rem;
     padding-left: 1rem;
@@ -2713,7 +2857,6 @@ body.lightbox-open {
   .founder-chairperson { margin-top: 2rem; padding-top: 1.5rem; }
   .founder-chairperson-name { font-size: 1.05rem; }
 
-  /* PWA install banner */
   .pwa-install-banner {
     left: 0.65rem;
     right: 0.65rem;
@@ -2732,7 +2875,8 @@ body.lightbox-open {
   .hero-title { font-size: 2rem; }
   .hero-subtitle { font-size: 0.95rem; }
   .form-wrapper { padding: 1.25rem 0.9rem; }
-    .campus-card { height: 140px; }
+
+  .campus-card { height: 140px; }
   .campus-label {
     padding: 0.5rem 0.55rem;
     font-size: 0.72rem;
@@ -2749,36 +2893,22 @@ body.lightbox-open {
   .reference-box { padding: 1rem; }
   .hero-logo { max-width: 160px; }
   .news-page-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
-  .news-card-body {
-  padding: 0.7rem 0.65rem 0.85rem;
-}
-.news-card h4 {
-  font-size: 0.85rem;
-  line-height: 1.25;
-  margin-bottom: 0.3rem;
-}
-.news-card p {
-  font-size: 0.72rem;
-  line-height: 1.45;
-}
-.news-date {
-  font-size: 0.68rem;
-  margin-bottom: 0.3rem;
-}
-.news-category,
-.news-category-floating {
-  font-size: 0.6rem;
-  padding: 0.12rem 0.5rem;
-  margin-bottom: 0.4rem;
-}
-.news-category-floating {
-  top: 0.5rem;
-  left: 0.5rem;
-  margin-bottom: 0;
-}
-  .news-card-image-wrap {
-  aspect-ratio: 16 / 10;
-}
+  .news-card-body { padding: 0.7rem 0.65rem 0.85rem; }
+  .news-card h4 { font-size: 0.85rem; line-height: 1.25; margin-bottom: 0.3rem; }
+  .news-card p { font-size: 0.72rem; line-height: 1.45; }
+  .news-date { font-size: 0.68rem; margin-bottom: 0.3rem; }
+  .news-category,
+  .news-category-floating {
+    font-size: 0.6rem;
+    padding: 0.12rem 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .news-category-floating {
+    top: 0.5rem;
+    left: 0.5rem;
+    margin-bottom: 0;
+  }
+  .news-card-image-wrap { aspect-ratio: 16 / 10; }
   .news-page-num { width: 34px; height: 34px; font-size: 0.8rem; }
   .review-form-wrapper { padding: 1.5rem 1rem; }
   .journal-volume { padding: 1.25rem 1rem 1rem; }
@@ -2790,9 +2920,8 @@ body.lightbox-open {
   .journal-card.pos-4 { left: 32%; }
   .journal-card.pos-5 { left: 12%; }
 
-  /* Founder responsive */
   .founder-card { padding: 1.75rem 1rem 1.5rem; }
-  .founder-photo-wrap { width: 120px; height: 120px; }
+  .founder-photo-wrap { width: 140px; height: 140px; }
   .founder-name { font-size: 1.05rem; }
   .founder-role { font-size: 0.8rem; }
   .founder-quote { font-size: 0.92rem; line-height: 1.65; }
