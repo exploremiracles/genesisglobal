@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Genesis Global Academy, Kashmir</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="A nurturing learning environment from Nursery to Class 8. Explore our school, academics, admissions, and campus." />
@@ -47,7 +46,7 @@
         <div class="site-header-text">
           <span class="site-header-title">Genesis Global Academy</span>
           <span class="site-header-subtitle">
-            <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
+            <i class="bi bi-book"></i> Nursery to Class 8
           </span>
         </div>
       </a>
@@ -130,8 +129,33 @@
     <!-- HERO -->
     <!-- HERO -->
 <header id="home" class="hero-section">
+
+  <!-- Background: video on desktop, image on mobile -->
+  <div class="hero-media" aria-hidden="true">
+    
+    <!-- Desktop only: video (CSS hides on mobile via display:none) -->
+    <video
+      class="hero-media-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="poster.jpg"
+      disablepictureinpicture
+    >
+      <source src="bgvideo.mp4" type="video/mp4" />
+      <!-- Optional: add webm for smaller file size on modern browsers
+      <source src="hero-video.webm" type="video/webm" />
+      -->
+    </video>
+  </div>
+
+  <!-- Existing navy tint overlay -->
   <div class="hero-overlay"></div>
   <div class="hero-particles" aria-hidden="true"></div>
+
+  <!-- ... rest of hero content unchanged ... -->
   <div class="container hero-content">
     <div class="row align-items-center gy-4">
 
@@ -142,11 +166,14 @@
         </div>
       </div>
 
-      <div class="col-lg-7 text-center text-lg-start" data-aos="fade-right">
+      <div class="col-12 col-lg-6 text-center text-lg-start" data-aos="fade-right">
         <div class="hero-badge mb-3">
-          <i class="bi bi-geo-alt-fill"></i> Nursery to Class 8
+          <i class="bi bi-book"></i> Nursery to Class 8
         </div>
-        <h1 class="hero-title">Where Learning<br />Becomes Light</h1>
+        <h1 class="hero-title">
+  Where Learning<br />
+  becomes <span class="hero-title-accent">Light...</span>
+</h1>
         <p class="hero-subtitle">
           A nurturing learning environment for children from Nursery to Class 8,
           focused on knowledge, character, creativity, and confident growth.
@@ -158,7 +185,7 @@
       </div>
 
       <!-- Desktop/tablet-only logo: right column -->
-      <div class="col-lg-5 d-none d-lg-flex justify-content-center" data-aos="fade-left">
+      <div class="col-lg-6 d-none d-lg-flex justify-content-center" data-aos="fade-left">
         <div class="hero-logo-wrap">
           <img src="logo3.png" alt="School Logo – Genesis Global Academy" class="hero-logo" />
         </div>
@@ -423,7 +450,7 @@ I cannot think of words that describe my father better.<br>
               <p class="academic-level">Class 6 – 8</p>
               <p><strong>Age:</strong> 11–14 years</p>
               <p><strong>Approach:</strong> Inquiry-based, subject-specialised.</p>
-              <p><strong>Core Subjects:</strong> English, Maths, Science, Social Science, Hindi, Computer, Urdu.</p>
+              <p><strong>Core Subjects:</strong> English, Maths, Science, Social Science, Hindi, Computers, Urdu.</p>
               <p><strong>Focus:</strong> Analytical skills, research, leadership.</p>
             </div>
           </div>
