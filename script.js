@@ -1,19 +1,4 @@
-/* ============================================================
-   SCHOOL WEBSITE — MAIN JAVASCRIPT
-   ============================================================
-   Features:
-   - Firebase Firestore (compat SDK v9)
-   - Always-visible bottom section rail
-   - Active section highlight on scroll
-   - Animated counter (450+)
-   - News & Events (paginated 5/page, full-screen dialog)
-   - Reviews (public submission + admin-approval gated display)
-   - Faculty Directory (name + role + contact number)
-   - Downloads Journal (filterable, paginated, live)
-   - Admission form submission + PDF download
-   - Contact form submission
-   - Gallery journal + unified lightbox
-============================================================ */
+
 
 /* ============================================================
    FIREBASE CONFIG — REPLACE WITH YOUR OWN
@@ -356,12 +341,25 @@ facultyFilters.forEach(btn => {
 
     const dept = btn.dataset.dept;
     document.querySelectorAll('.faculty-card').forEach(card => {
-      if (dept === 'all' || card.dataset.dept === dept) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
+  const shouldShow = dept === 'all' || card.dataset.dept === dept;
+
+  if (shouldShow) {
+    // Show immediately and remove any pending display:none
+    card.classList.remove('hidden-after');
+    // Force reflow so the transition runs from 0 → 1
+    void card.offsetWidth;
+    card.classList.remove('hidden');
+  } else {
+    // Fade out first
+    card.classList.add('hidden');
+    // After the transition finishes, collapse it from the grid
+    setTimeout(() => {
+      if (card.classList.contains('hidden')) {
+        card.classList.add('hidden-after');
       }
-    });
+    }, 300); // matches the transition duration
+  }
+});
   });
 });
 
@@ -402,28 +400,43 @@ function buildNewsCard(item) {
   const imageUrl = item.image ? sanitizeUrl(item.image) : '';
 
   col.innerHTML = `
-    <article class="news-card" role="button" tabindex="0" aria-label="Open news: ${title}">
-      ${imageUrl ? `
-        <div class="news-card-image-wrap">
-          <img
-            src="${escapeHtml(imageUrl)}"
-            alt="${title}"
-            class="news-card-image"
-            loading="lazy"
-            decoding="async"
-            onerror="this.parentElement.style.display='none'"
-          />
-          <span class="news-category news-category-floating">${category}</span>
-        </div>
-      ` : ''}
-      <div class="news-card-body">
-        ${dateText ? `<div class="news-date">${dateText}</div>` : ''}
-        ${!imageUrl ? `<span class="news-category">${category}</span>` : ''}
-        <h4>${title}</h4>
-        <p>${description}</p>
+  <article class="news-card" role="button" tabindex="0" aria-label="Open news: ${title}">
+    ${imageUrl ? `
+      <div class="news-card-image-wrap">
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="${title}"
+          class="news-card-image"
+          loading="lazy"
+          decoding="async"
+          onerror="this.parentElement.style.display='none'"
+        />
+        <span class="news-category news-category-floating">
+          <i class="bi bi-bookmark-fill"></i> ${category}
+        </span>
       </div>
-    </article>
-  `;
+    ` : ''}
+    <div class="news-card-body">
+      <div class="news-card-meta">
+        ${dateText ? `
+          <span class="news-date">
+            <i class="bi bi-calendar3"></i> ${dateText}
+          </span>
+        ` : ''}
+        ${!imageUrl ? `
+          <span class="news-category news-category-inline">
+            <i class="bi bi-bookmark-fill"></i> ${category}
+          </span>
+        ` : ''}
+      </div>
+      <h4 class="news-card-title">${title}</h4>
+      <p class="news-card-desc">${description}</p>
+      <span class="news-card-cta">
+        Read more <i class="bi bi-arrow-right"></i>
+      </span>
+    </div>
+  </article>
+`;
 
   const card = col.querySelector('.news-card');
   card.addEventListener('click', () => openNewsDialog(item));
@@ -534,14 +547,25 @@ function openNewsDialog(item) {
   const bodyText = item.content || item.description || 'No additional details available.';
   newsDialogBody.textContent = bodyText;
 
+  // iOS-safe scroll lock — matches the lightbox pattern so the
+  // page doesn't jump when the dialog opens.
+  const y = window.scrollY || window.pageYOffset || 0;
+  document.body.style.setProperty('--scroll-lock-y', `-${y}px`);
+  document.body.classList.add('lightbox-open');
+
   newsDialog.classList.remove('d-none');
-  document.body.style.overflow = 'hidden';
   setTimeout(() => newsDialogClose.focus({ preventScroll: true }), 50);
 }
 
 function closeNewsDialog() {
   newsDialog.classList.add('d-none');
-  document.body.style.overflow = '';
+
+  // Release the iOS-safe scroll lock and restore the exact position
+  const y = parseInt(document.body.style.getPropertyValue('--scroll-lock-y') || '0', 10) || 0;
+  document.body.classList.remove('lightbox-open');
+  document.body.style.removeProperty('--scroll-lock-y');
+  window.scrollTo({ top: Math.abs(y), left: 0, behavior: 'instant' });
+
   if (dialogLastFocusedElement && typeof dialogLastFocusedElement.focus === 'function') {
     dialogLastFocusedElement.focus({ preventScroll: true });
   }
@@ -1946,6 +1970,16 @@ document.getElementById('backBtn')?.addEventListener('click', () => {
   successMessage.classList.add('d-none');
   admissionForm.classList.remove('d-none');
   admissionForm.reset();
+
+  // Reset the reveal state so the form is visible again
+  const formSection = document.getElementById('admissionForm');
+  const formWrapper = formSection ? formSection.querySelector('.form-wrapper') : null;
+  if (formSection && formWrapper) {
+    formSection.classList.remove('admission-form-hidden');
+    formWrapper.classList.remove('admission-form-collapsed');
+    formWrapper.classList.add('admission-form-open');
+  }
+
   document.getElementById('admissions').scrollIntoView({ behavior: 'smooth' });
 });
 
@@ -2219,4 +2253,20 @@ window.addEventListener('resize', () => {
       }
     }, 6000);
   }
+})();
+/* ============================================================
+   HERO VIDEO — pause when tab hidden, resume when visible
+============================================================ */
+(function initHeroVideo() {
+  const video = document.querySelector('.hero-media-video');
+  if (!video) return;
+
+  // Some browsers still need an explicit play() after page load
+  const tryPlay = () => video.play().catch(() => { /* autoplay blocked — poster stays */ });
+  tryPlay();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) video.pause();
+    else tryPlay();
+  });
 })();
