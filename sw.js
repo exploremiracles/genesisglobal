@@ -8,19 +8,16 @@
    - Fallback to offline.html when the network is unavailable
 ============================================================ */
 
-const CACHE_VERSION = 'wol-v1.0.18';
+const CACHE_VERSION = 'wol-v1.0.50';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  'logo1.png'
+  '/', '/index.html', '/offline.html',
+  '/style.css', '/script.js', '/manifest.json',
+  'logo1.png', 'logo2.png', 'logo3.png',
+  'bgvideo.mp4', 'poster.jpg'
 ];
 
 /* ============================================================
