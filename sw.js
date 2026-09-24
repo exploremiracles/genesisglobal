@@ -1,23 +1,33 @@
 /* ============================================================
-   SERVICE WORKER — World of Light School PWA
+   SERVICE WORKER — Genesis Global Academy PWA
    ============================================================
    Strategy:
-   - Precache the app shell (HTML, CSS, JS, logo, offline page)
-   - Network-first for Firebase requests (always fresh data)
-   - Cache-first for static assets (images, fonts, CSS, JS)
-   - Fallback to offline.html when the network is unavailable
+   - Precache the app shell (HTML, CSS, JS, logos, offline page)
+   - Firestore / Realtime DB — bypass SW (SDK handles its own cache)
+   - Firebase SDK scripts — network-first
+   - Images — cache-first with offline SVG placeholder
+   - HTML navigation — network-first with offline.html fallback
+   - JS / CSS / JSON — network-first (so updates land promptly)
+   - Fonts / everything else — cache-first
 ============================================================ */
 
-const CACHE_VERSION = 'wol-v1.0.51';
+const CACHE_VERSION = 'wol-v1.0.53';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
 const APP_SHELL = [
-  '/', '/index.html', '/offline.html',
-  '/style.css', '/script.js', '/manifest.json',
-  'logo1.png', 'logo2.png', 'logo3.png',
-  'bgvideo.mp4', 'poster.jpg'
+  '/',
+  '/index.html',
+  '/offline.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  'logo1.png',
+  'logo2.png',
+  'logo3.png',
+  'hero-video.mp4',
+  'hero-poster.jpg'
 ];
 
 /* ============================================================
@@ -30,7 +40,9 @@ self.addEventListener('install', (event) => {
       .then(cache => cache.addAll(APP_SHELL).catch(err => {
         console.warn('[SW] Precache had errors (some assets may be missing):', err);
       }))
-      .then(() => self.skipWaiting())
+      // NOTE: intentionally NOT calling self.skipWaiting() here.
+      // The page controls activation via postMessage({type:'SKIP_WAITING'})
+      // when it detects an update — this avoids mid-session reloads.
   );
 });
 
@@ -63,53 +75,55 @@ self.addEventListener('fetch', (event) => {
   // Ignore non-GET requests (POST to Firestore etc.)
   if (request.method !== 'GET') return;
 
-  // Ignore browser extensions and chrome-extension:// URLs
+  // Ignore browser extension URLs
   if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') return;
 
-  // ---- Firebase / Firestore / gstatic APIs — always network-first ----
+  // ---- Firestore / Realtime DB — let the browser handle these directly.
+  // The Firebase SDK has its own IndexedDB cache and offline layer.
+  // Intercepting them here adds latency and can conflict with the SDK.
   if (
-    url.hostname.includes('firebase') ||
-    url.hostname.includes('firestore') ||
-    url.hostname.includes('googleapis.com') ||
-    url.hostname.includes('gstatic.com/firebasejs')
+    url.hostname === 'firestore.googleapis.com' ||
+    url.hostname.endsWith('.firebaseio.com')
   ) {
+    return; // no event.respondWith() → browser fetches normally
+  }
+
+  // ---- Firebase SDK scripts from gstatic — network-first
+  if (url.hostname === 'www.gstatic.com' && url.pathname.includes('/firebasejs/')) {
     event.respondWith(networkFirst(request, RUNTIME_CACHE));
     return;
   }
 
-  // ---- Images — cache-first with long expiry ----
+  // ---- Images — cache-first with long expiry
   if (request.destination === 'image') {
     event.respondWith(cacheFirst(request, IMAGE_CACHE));
     return;
   }
 
-  // ---- HTML navigation — network-first with offline fallback ----
+  // ---- HTML navigation — network-first with offline fallback
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith(navigationHandler(request));
     return;
   }
 
-  // ---- Everything else (CSS, JS, fonts) — cache-first ----
-  // ---- JS, CSS, JSON — network-first, so content updates show up ----
-if (
-  request.destination === 'script' ||
-  request.destination === 'style' ||
-  url.pathname.endsWith('.js') ||
-  url.pathname.endsWith('.css') ||
-  url.pathname.endsWith('.json')
-) {
-  event.respondWith(networkFirst(request, RUNTIME_CACHE));
-  return;
-}
+  // ---- JS, CSS, JSON — network-first so content updates show up
+  if (
+    request.destination === 'script' ||
+    request.destination === 'style' ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.json')
+  ) {
+    event.respondWith(networkFirst(request, RUNTIME_CACHE));
+    return;
+  }
 
-// ---- Everything else (fonts, etc.) — cache-first ----
-event.respondWith(cacheFirst(request, RUNTIME_CACHE));
-return;
+  // ---- Everything else (fonts, etc.) — cache-first
+  event.respondWith(cacheFirst(request, RUNTIME_CACHE));
 });
 
 /* ============================================================
    STRATEGY: Cache First
-   Return from cache if available; otherwise fetch and cache.
 ============================================================ */
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -118,8 +132,15 @@ async function cacheFirst(request, cacheName) {
 
   try {
     const response = await fetch(request);
-    if (response && response.status === 200 && response.type === 'basic') {
-      cache.put(request, response.clone());
+    // Cache successful responses — allow basic (same-origin) and
+    // cors (e.g. Google Fonts) responses. Opaque responses can't
+    // be inspected and put() may fail, so we skip them.
+    if (
+      response &&
+      response.status === 200 &&
+      (response.type === 'basic' || response.type === 'cors')
+    ) {
+      cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch (error) {
@@ -136,20 +157,18 @@ async function cacheFirst(request, cacheName) {
 
 /* ============================================================
    STRATEGY: Network First
-   Try the network; fall back to cache.
 ============================================================ */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   try {
     const response = await fetch(request);
-    if (response && response.status === 200) {
-      cache.put(request, response.clone());
+    if (response && response.status === 200 && response.type !== 'opaque') {
+      cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch (error) {
     const cached = await cache.match(request);
     if (cached) return cached;
-    // No cache and no network — return an error response
     return new Response('Offline — please check your connection.', {
       status: 503,
       statusText: 'Service Unavailable',
@@ -160,14 +179,13 @@ async function networkFirst(request, cacheName) {
 
 /* ============================================================
    STRATEGY: Navigation (HTML pages)
-   Network-first. If network fails, show cached page or offline.html.
 ============================================================ */
 async function navigationHandler(request) {
   try {
     const response = await fetch(request);
     if (response && response.status === 200) {
       const cache = await caches.open(APP_SHELL_CACHE);
-      cache.put(request, response.clone());
+      cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch (error) {
