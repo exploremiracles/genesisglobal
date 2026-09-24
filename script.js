@@ -2,7 +2,7 @@
    SCHOOL WEBSITE — MAIN JAVASCRIPT
    ============================================================
    Features:
-   - Firebase Firestore (compat SDK v9)
+   - Firebase Firestore (compat SDK v9) + offline persistence
    - Always-visible bottom section rail
    - Active section highlight on scroll
    - Animated counter (450+)
@@ -13,6 +13,7 @@
    - Admission form submission + PDF download
    - Contact form submission
    - Gallery journal + unified lightbox
+   - PWA install prompt + service worker
 ============================================================ */
 
 /* ============================================================
@@ -30,8 +31,26 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.firestore();
-console.log('🔥 Firebase connected (Firestore)');
+
+// Enable offline persistence so subsequent PWA loads serve Firestore
+// data from local IndexedDB instantly, then sync in the background.
+// This is THE fix for slow first paint of News/Reviews/Downloads on mobile.
+db.enablePersistence({ synchronizeTabs: true })
+  .then(() => {
+    console.log('🔥 Firebase connected (Firestore + offline persistence)');
+  })
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('Firestore persistence unavailable (multiple tabs).');
+    } else if (err.code === 'unimplemented') {
+      console.warn('Firestore persistence not supported by this browser.');
+    } else {
+      console.warn('Firestore persistence error:', err);
+    }
+    console.log('🔥 Firebase connected (Firestore, no persistence)');
+  });
 
 /* ============================================================
    AOS INIT
@@ -111,11 +130,6 @@ function formatDate(value) {
 
 /* ============================================================
    FIRESTORE SUBSCRIPTION RETRY HELPER
-   ============================================================
-   Every section that subscribes to Firestore registers a retry
-   callback here. If the subscription errors, we retry after
-   a delay so transient network issues self-heal without a
-   page refresh.
 ============================================================ */
 window.__firestoreRetryTimers = window.__firestoreRetryTimers || {};
 
@@ -194,13 +208,9 @@ function updateActiveSection() {
   let currentId = '';
 
   trackedSections.forEach(section => {
-    // Skip sections that are hidden (e.g. the collapsed admission form).
-    // A hidden element reports offsetTop = 0 which would break the loop.
     if (section.offsetParent === null && section.id !== 'admissionForm') return;
     if (getComputedStyle(section).display === 'none') return;
 
-    // Use getBoundingClientRect for a viewport-relative position,
-    // then convert to document-relative.
     const rect = section.getBoundingClientRect();
     const top = rect.top + window.scrollY;
 
@@ -221,7 +231,7 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 updateActiveSection();
 
-/* Auto-scroll the rail horizontally to keep active tile centered on small screens */
+/* Auto-scroll the rail horizontally to keep active tile centered */
 const sectionRail = document.getElementById('sectionRail');
 function scrollRailToActive() {
   if (!sectionRail) return;
@@ -246,7 +256,7 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 /* ============================================================
-   ANIMATED COUNTER (450+)
+   ANIMATED COUNTER
 ============================================================ */
 function initCounters() {
   const counters = document.querySelectorAll('.counter-value');
@@ -283,7 +293,7 @@ function animateCounter(el, target) {
 initCounters();
 
 /* ============================================================
-   FACULTY DIRECTORY — name + role + contact number
+   FACULTY DIRECTORY
 ============================================================ */
 const facultyData = [
   { name: "Muntazir Mehdi", role: "Chairperson", dept: "leadership", deptLabel: "Leadership", phone: "+919622222723" },
@@ -356,25 +366,21 @@ facultyFilters.forEach(btn => {
 
     const dept = btn.dataset.dept;
     document.querySelectorAll('.faculty-card').forEach(card => {
-  const shouldShow = dept === 'all' || card.dataset.dept === dept;
+      const shouldShow = dept === 'all' || card.dataset.dept === dept;
 
-  if (shouldShow) {
-    // Show immediately and remove any pending display:none
-    card.classList.remove('hidden-after');
-    // Force reflow so the transition runs from 0 → 1
-    void card.offsetWidth;
-    card.classList.remove('hidden');
-  } else {
-    // Fade out first
-    card.classList.add('hidden');
-    // After the transition finishes, collapse it from the grid
-    setTimeout(() => {
-      if (card.classList.contains('hidden')) {
-        card.classList.add('hidden-after');
+      if (shouldShow) {
+        card.classList.remove('hidden-after');
+        void card.offsetWidth; // force reflow so fade-in animates
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+        setTimeout(() => {
+          if (card.classList.contains('hidden')) {
+            card.classList.add('hidden-after');
+          }
+        }, 300); // matches the 0.3s transition on .faculty-card
       }
-    }, 300); // matches the transition duration
-  }
-});
+    });
   });
 });
 
@@ -406,7 +412,9 @@ let currentNewsPage = 1;
 function buildNewsCard(item) {
   const col = document.createElement('div');
   col.className = 'col-md-6 col-lg-4';
-  col.setAttribute('data-aos', 'fade-up');
+  // NOTE: intentionally no data-aos here — dynamic cards are added
+  // after AOS runs, which can leave them invisible if AOS already
+  // fired for that section. They appear instantly instead.
 
   const dateText = formatDate(item.date);
   const category = escapeHtml(item.category || 'News');
@@ -563,7 +571,7 @@ function openNewsDialog(item) {
   newsDialogBody.textContent = bodyText;
 
   // iOS-safe scroll lock — matches the lightbox pattern so the
-  // page doesn't jump when the dialog opens.
+  // page doesn't jump to top when the dialog closes.
   const y = window.scrollY || window.pageYOffset || 0;
   document.body.style.setProperty('--scroll-lock-y', `-${y}px`);
   document.body.classList.add('lightbox-open');
@@ -643,12 +651,10 @@ function initNews() {
             newsErrorState.classList.remove('d-none');
           });
 
-        // Auto-retry after 10 seconds so transient failures self-heal
         scheduleRetry('news', () => initNews(), 10000);
       }
     );
 }
-initNews();
 
 /* ============================================================
    REVIEWS — only approved reviews are publicly readable
@@ -715,7 +721,7 @@ starButtons.forEach(btn => {
 function buildReviewCard(item) {
   const col = document.createElement('div');
   col.className = 'col-6 col-lg-4';
-  col.setAttribute('data-aos', 'fade-up');
+  // No data-aos — dynamic content appears instantly.
 
   const name = escapeHtml(item.name || 'Anonymous');
   const role = escapeHtml(item.role || '');
@@ -873,8 +879,6 @@ function initReviews() {
     }
   }, 10000);
 
-  // Only fetch approved reviews, capped at 50 most recent.
-  // This keeps the payload light even as the review count grows.
   db.collection('reviews')
     .where('approved', '==', true)
     .orderBy('createdAt', 'desc')
@@ -892,7 +896,6 @@ function initReviews() {
 
         const items = [];
         snapshot.forEach(doc => items.push({ _id: doc.id, ...doc.data() }));
-        // Firestore already sorted by createdAt desc — no client-side sort needed
         console.log(`✅ Loaded ${items.length} approved reviews`);
         renderReviews(items);
       },
@@ -900,8 +903,6 @@ function initReviews() {
         clearTimeout(timeoutId);
         console.error('Firestore reviews error:', error);
 
-        // Fallback: try without orderBy in case the composite index
-        // (approved + createdAt) hasn't been created yet.
         db.collection('reviews')
           .where('approved', '==', true)
           .limit(50)
@@ -922,12 +923,10 @@ function initReviews() {
             reviewsErrorState.classList.remove('d-none');
           });
 
-        // Auto-retry after 10 seconds so transient failures self-heal
         scheduleRetry('reviews', () => initReviews(), 10000);
       }
     );
 }
-initReviews();
 
 function showReviewError(fieldId, message) {
   const field = document.getElementById(fieldId);
@@ -1036,7 +1035,7 @@ document.getElementById('reviewAgainBtn')?.addEventListener('click', () => {
 highlightStars(0);
 
 /* ============================================================
-   DOWNLOADS JOURNAL — Firestore, filterable, paginated
+   DOWNLOADS JOURNAL
 ============================================================ */
 const DOWNLOADS_PER_PAGE = 6;
 
@@ -1242,7 +1241,6 @@ function initDownloads() {
       }
     );
 }
-initDownloads();
 
 /* ============================================================
    GALLERY — Journal
@@ -1375,8 +1373,8 @@ function renderJournal() {
     grid.appendChild(buildJournalVolume(volume, idx));
   });
 
-  if (window.AOS && typeof AOS.refresh === 'function') {
-    AOS.refresh();
+  if (window.AOS && typeof window.AOS.refresh === 'function') {
+    window.AOS.refresh();
   }
 
   attachLightboxTriggers();
@@ -1436,7 +1434,6 @@ function updateLightboxImage() {
     lightboxCounter.textContent = `${lightboxIndex + 1} / ${lightboxItems.length}`;
   }
 
-  // Preload neighbors so Next/Prev is instant
   if (lightboxItems.length > 1) {
     const nextItem = lightboxItems[(lightboxIndex + 1) % lightboxItems.length];
     const prevItem = lightboxItems[(lightboxIndex - 1 + lightboxItems.length) % lightboxItems.length];
@@ -1524,7 +1521,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ============================================================
-   INITIALIZE
+   INITIALIZE GALLERY + LIGHTBOX
 ============================================================ */
 attachLightboxTriggers();
 renderJournal();
@@ -1684,45 +1681,31 @@ admissionForm.addEventListener('submit', async (e) => {
 
 /* ============================================================
    ADMISSION FORM — Reveal / Collapse
-   ============================================================
-   The admission form section is hidden by default. Clicking the
-   "Apply for Admission" button reveals it with a smooth fade+slide.
-   Clicking Cancel (or submitting successfully) collapses it back.
 ============================================================ */
 (function initAdmissionFormReveal() {
   const formSection = document.getElementById('admissionForm');
   const formWrapper = formSection ? formSection.querySelector('.form-wrapper') : null;
   if (!formSection || !formWrapper) return;
 
-  // All buttons that should trigger the reveal
-  // (any link pointing to #admissionForm, plus the Apply buttons in
-  //  the admissions section and CTA section)
   const applyTriggers = document.querySelectorAll(
     'a[href="#admissionForm"], #applyForAdmissionBtn, [data-open-admission]'
   );
 
   const cancelBtn = document.getElementById('cancelAdmissionBtn');
 
-  // Start hidden
   formSection.classList.add('admission-form-hidden');
   formWrapper.classList.remove('admission-form-open');
   formWrapper.classList.add('admission-form-collapsed');
 
   function openAdmissionForm() {
-    // Unhide the section first (so height can animate)
     formSection.classList.remove('admission-form-hidden');
-
-    // Force a reflow so the browser registers the display change
-    // before we trigger the opacity/transform transition
     void formSection.offsetHeight;
 
-    // Reveal the wrapper on the next frame for a smooth transition
     requestAnimationFrame(() => {
       formWrapper.classList.remove('admission-form-collapsed');
       formWrapper.classList.add('admission-form-open');
     });
 
-    // Smooth-scroll to the form (offset by the fixed header)
     setTimeout(() => {
       const headerHeight = parseInt(
         getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '68',
@@ -1734,15 +1717,11 @@ admissionForm.addEventListener('submit', async (e) => {
   }
 
   function closeAdmissionForm() {
-    // Fade out first
     formWrapper.classList.remove('admission-form-open');
     formWrapper.classList.add('admission-form-collapsed');
 
-    // After the transition ends, hide the section so it takes no space
     setTimeout(() => {
       formSection.classList.add('admission-form-hidden');
-      // Scroll back to the admissions section so the user isn't left
-      // in an empty area
       const admissionsSection = document.getElementById('admissions');
       if (admissionsSection) {
         const headerHeight = parseInt(
@@ -1752,10 +1731,9 @@ admissionForm.addEventListener('submit', async (e) => {
         const top = admissionsSection.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
         window.scrollTo({ top, behavior: 'smooth' });
       }
-    }, 480); // matches the 0.5s transition duration
+    }, 480);
   }
 
-  // Wire up all "Apply" triggers
   applyTriggers.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1763,36 +1741,21 @@ admissionForm.addEventListener('submit', async (e) => {
     });
   });
 
-  // Wire up the Cancel button
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
-      // Clear validation state before hiding
       formWrapper.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
       closeAdmissionForm();
     });
   }
 
-  // Expose closeAdmissionForm so the submit success handler can trigger it
   window.__closeAdmissionForm = closeAdmissionForm;
-
-  // Also close the form after a successful submission (optional)
-  // Uncomment the block below if you want the form to auto-hide
-  // after the success card is dismissed via "Back to Website".
-  //
-  // document.getElementById('backBtn')?.addEventListener('click', () => {
-  //   closeAdmissionForm();
-  // });
 })();
 
-/* ============================================================
-   ADMISSION PDF DOWNLOAD
-============================================================ */
 /* ============================================================
    ADMISSION PDF DOWNLOAD (lazy-loads jsPDF on first click)
 ============================================================ */
 document.getElementById('printBtn')?.addEventListener('click', async () => {
   try {
-    // Lazy-load jsPDF on first use to keep initial page weight light
     if (!window.jspdf) {
       try {
         await new Promise((resolve, reject) => {
@@ -2169,7 +2132,6 @@ window.addEventListener('resize', () => {
   });
 
   function showUpdateBanner(worker) {
-    // Update banner disabled — service worker auto-updates silently
     if (worker) {
       worker.postMessage({ type: 'SKIP_WAITING' });
     }
@@ -2288,10 +2250,8 @@ window.addEventListener('resize', () => {
     }
   };
 
-  // Initial attempt — may fail silently on mobile
   tryPlay();
 
-  // Retry on first real user interaction (tap, click, key, scroll)
   const retryOnInteraction = () => {
     if (hasStarted && !video.paused) return;
     tryPlay();
@@ -2302,7 +2262,6 @@ window.addEventListener('resize', () => {
     window.addEventListener(evt, retryOnInteraction, { passive: true, once: false });
   });
 
-  // Also retry when the video becomes visible in the viewport
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -2312,7 +2271,6 @@ window.addEventListener('resize', () => {
     io.observe(video);
   }
 
-  // Pause when the tab is hidden, resume when visible again
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       video.pause();
@@ -2321,6 +2279,12 @@ window.addEventListener('resize', () => {
     }
   });
 
-  // Some browsers fire 'canplay' late; retry then too
   video.addEventListener('canplay', retryOnInteraction, { once: true });
 })();
+
+/* ============================================================
+   FIRESTORE SUBSCRIPTIONS — fired together for parallel loading
+============================================================ */
+initNews();
+initReviews();
+initDownloads();
