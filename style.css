@@ -374,15 +374,11 @@ img { max-width: 100%; height: auto; }
 
 /* ============================================================
    HERO
-   ============================================================
-   Consolidated hero rules. All short-viewport handling is
-   in one place so the header offset is never overridden.
 ============================================================ */
 .hero-section {
   position: relative;
   min-height: calc(100vh - var(--header-height) - var(--rail-height));
-  /* background moved to .hero-media — no more url() here */
-  background-color: var(--navy); /* fallback while video/image loads */
+  background-color: var(--navy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -400,7 +396,7 @@ img { max-width: 100%; height: auto; }
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: var(--navy); /* prevents white flash before video loads */
+  background: var(--navy);
 }
 
 .hero-media-video {
@@ -414,8 +410,6 @@ img { max-width: 100%; height: auto; }
   pointer-events: none;
 }
 
-/* Accessibility: pause for reduced-motion users.
-   The poster stays visible via the video element itself. */
 @media (prefers-reduced-motion: reduce) {
   .hero-media-video {
     display: none;
@@ -436,14 +430,13 @@ img { max-width: 100%; height: auto; }
       rgba(1, 25, 89, 0.35) 50%,
       rgba(1, 25, 89, 0.75) 100%
     );
-  /* extra subtle vignette so text is always readable */
   box-shadow: inset 0 0 180px 40px rgba(1, 25, 89, 0.35);
 }
 
 .hero-particles {
   position: absolute;
   inset: 0;
-  z-index: 2;   /* was 1 — now above the overlay */
+  z-index: 2;
   background-image: radial-gradient(rgba(194, 183, 119, 0.15) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
@@ -451,7 +444,7 @@ img { max-width: 100%; height: auto; }
 
 .hero-content {
   position: relative;
-  z-index: 3;   /* was 2 — now topmost */
+  z-index: 3;
   width: 100%;
   max-width: 100%;
 }
@@ -461,7 +454,7 @@ img { max-width: 100%; height: auto; }
   bottom: -1px;
   left: 0;
   width: 100%;
-  z-index: 4;   /* was 3 */
+  z-index: 4;
 }
 
 .hero-badge {
@@ -483,9 +476,7 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 1.5rem;
   word-wrap: break-word;
 }
-/* ============================================================
-   HERO TITLE — "Light" accent
-============================================================ */
+
 .hero-title-accent {
   background: linear-gradient(
     135deg,
@@ -497,14 +488,13 @@ img { max-width: 100%; height: auto; }
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent; /* fallback */
+  color: transparent;
   position: relative;
   display: inline-block;
   filter: drop-shadow(0 0 18px rgba(194, 183, 119, 0.55))
           drop-shadow(0 0 36px rgba(194, 183, 119, 0.25));
 }
 
-/* Fallback for browsers that don't support background-clip: text */
 @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
   .hero-title-accent {
     color: var(--gold);
@@ -520,13 +510,13 @@ img { max-width: 100%; height: auto; }
   max-width: 550px;
   height: auto;
   margin-bottom: 2rem;
-  margin-left: auto;   /* centers on mobile */
+  margin-left: auto;
   margin-right: auto;
 }
 
 @media (min-width: 992px) {
   .hero-subtitle {
-    margin-left: 0;    /* left-aligned on desktop */
+    margin-left: 0;
     margin-right: 0;
   }
 }
@@ -546,7 +536,6 @@ img { max-width: 100%; height: auto; }
   filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.35));
 }
 
-/* Mobile-only logo container */
 .hero-logo-mobile {
   display: flex;
   justify-content: center;
@@ -561,19 +550,18 @@ img { max-width: 100%; height: auto; }
   height: auto;
 }
 
-
 .hero-wave svg { display: block; width: 100%; height: 80px; }
 
 .hero-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  justify-content: center;   /* center on mobile */
+  justify-content: center;
 }
 
 @media (min-width: 992px) {
   .hero-buttons {
-    justify-content: flex-start;  /* left on desktop */
+    justify-content: flex-start;
   }
 }
 
@@ -581,11 +569,9 @@ img { max-width: 100%; height: auto; }
    HERO LAYOUT — balanced gutters on desktop
 ============================================================ */
 .hero-content > .row {
-  /* Even out left/right visual weight */
   align-items: center;
 }
 
-/* On desktop, tighten the text column and center its content vertically */
 @media (min-width: 992px) {
   .hero-content {
     max-width: 1200px;
@@ -594,7 +580,6 @@ img { max-width: 100%; height: auto; }
     padding-right: 1rem;
   }
 
-  /* Remove extra gutter asymmetry */
   .hero-content > .row {
     --bs-gutter-x: 2rem;
     margin-left: 0;
@@ -607,14 +592,10 @@ img { max-width: 100%; height: auto; }
   }
 }
 
-/* ---- Short viewport safety (split-screen, landscape phones) ----
-   These override padding only to ADD MORE SPACE at the top,
-   never less than the header. The header offset is preserved.
-   ------------------------------------------------------------- */
+/* ---- Short viewport safety ---- */
 @media (max-height: 720px) {
   .hero-section {
     min-height: auto;
-    /* keep header offset + reduce bottom breathing room */
     padding: calc(var(--header-height) + 1.25rem) 0 4rem;
     align-items: flex-start;
   }
@@ -1114,6 +1095,9 @@ img { max-width: 100%; height: auto; }
   border: 1px solid rgba(194, 183, 119, 0.2);
   max-width: 100%;
   overflow: hidden;
+  transition: opacity 0.5s ease,
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 .form-section-title {
   font-size: 1.15rem;
@@ -1154,32 +1138,17 @@ img { max-width: 100%; height: auto; }
 
 /* ============================================================
    ADMISSION FORM — Collapsible reveal
-   ============================================================
-   The form starts collapsed (zero height, invisible, no padding).
-   When the Apply button is clicked, JS adds `.admission-form-open`
-   to the wrapper, which smoothly expands it.
 ============================================================ */
-
-/* Collapsed state — the form section itself is hidden */
 .admission-form-section.admission-form-hidden {
   display: none;
 }
 
-/* Form wrapper animations */
-.form-wrapper {
-  transition: opacity 0.5s ease,
-              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-/* Pre-reveal state — invisible and slightly shifted down */
 .form-wrapper.admission-form-collapsed {
   opacity: 0;
   transform: translateY(24px);
   pointer-events: none;
 }
 
-/* Revealed state — fully visible and in place */
 .form-wrapper.admission-form-open {
   opacity: 1;
   transform: translateY(0);
@@ -1273,8 +1242,6 @@ img { max-width: 100%; height: auto; }
   opacity: 0;
   transform: scale(0.92);
   pointer-events: none;
-  /* keep the card in the grid flow for the transition, then it
-     becomes display:none once the animation ends (handled by JS) */
 }
 
 .faculty-card.hidden-after {
@@ -1698,15 +1665,10 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   NEWS & EVENTS
-============================================================ */
-/* ============================================================
    NEWS & EVENTS — Editorial card design
 ============================================================ */
-
 .news-section { background: var(--white); }
 
-/* ---- Card shell ---- */
 .news-card {
   position: relative;
   background: linear-gradient(180deg, #FFFFFF 0%, #FBFAF5 100%);
@@ -1724,7 +1686,6 @@ img { max-width: 100%; height: auto; }
 }
 
 .news-card::before {
-  /* thin gold accent on top edge */
   content: "";
   position: absolute;
   top: 0;
@@ -1745,7 +1706,6 @@ img { max-width: 100%; height: auto; }
 
 .news-card:hover::before { opacity: 1; }
 
-/* ---- Image ---- */
 .news-card-image-wrap {
   position: relative;
   width: 100%;
@@ -1766,7 +1726,6 @@ img { max-width: 100%; height: auto; }
   transform: scale(1.08);
 }
 
-/* ---- Floating category pill ---- */
 .news-category-floating {
   position: absolute;
   top: 0.85rem;
@@ -1795,7 +1754,6 @@ img { max-width: 100%; height: auto; }
   opacity: 0.9;
 }
 
-/* ---- Body ---- */
 .news-card-body {
   padding: 1.4rem 1.5rem 1.6rem;
   display: flex;
@@ -1804,7 +1762,6 @@ img { max-width: 100%; height: auto; }
   gap: 0.75rem;
 }
 
-/* ---- Meta row (date + inline category) ---- */
 .news-card-meta {
   display: flex;
   align-items: center;
@@ -1831,7 +1788,6 @@ img { max-width: 100%; height: auto; }
   color: var(--crimson);
 }
 
-/* Inline category (only shown when there's no image) */
 .news-category-inline {
   display: inline-flex;
   align-items: center;
@@ -1851,7 +1807,6 @@ img { max-width: 100%; height: auto; }
   font-size: 0.7rem;
 }
 
-/* ---- Title ---- */
 .news-card-title {
   font-family: var(--font-serif);
   font-size: 1.2rem;
@@ -1866,7 +1821,6 @@ img { max-width: 100%; height: auto; }
 }
 
 .news-card-title::after {
-  /* small gold underline accent */
   content: "";
   position: absolute;
   bottom: 0;
@@ -1886,7 +1840,6 @@ img { max-width: 100%; height: auto; }
   color: var(--crimson);
 }
 
-/* ---- Description ---- */
 .news-card-desc {
   color: var(--gray);
   font-size: 0.92rem;
@@ -1899,7 +1852,6 @@ img { max-width: 100%; height: auto; }
   overflow: hidden;
 }
 
-/* ---- CTA ---- */
 .news-card-cta {
   display: inline-flex;
   align-items: center;
@@ -2663,8 +2615,78 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   CONTACT
+   CONTACT — Animated wave background
 ============================================================ */
+.contact-section {
+  position: relative;
+  background: linear-gradient(180deg, #F8F7F2 0%, #EEF0F4 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.contact-waves {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.contact-wave {
+  position: absolute;
+  bottom: -10%;
+  left: 0;
+  width: 200%;
+  height: 80%;
+  display: block;
+  will-change: transform;
+}
+
+.contact-wave--1 {
+  color: var(--gold);
+  animation: waveDrift 22s linear infinite;
+  bottom: -15%;
+  height: 90%;
+}
+
+.contact-wave--2 {
+  color: var(--crimson);
+  animation: waveDriftReverse 28s linear infinite;
+  bottom: -5%;
+  height: 75%;
+}
+
+.contact-wave--3 {
+  color: var(--navy);
+  animation: waveDrift 34s linear infinite;
+  bottom: -20%;
+  height: 85%;
+  animation-delay: -6s;
+}
+
+.contact-wave--4 {
+  color: #0a2570;
+  animation: waveDriftReverse 40s linear infinite;
+  bottom: 0;
+  height: 70%;
+  animation-delay: -12s;
+}
+
+@keyframes waveDrift {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes waveDriftReverse {
+  0%   { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.contact-section .container {
+  position: relative;
+  z-index: 1;
+}
+
 .contact-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
 .contact-item i {
   font-size: 1.3rem;
@@ -3026,7 +3048,6 @@ body.lightbox-open {
 
   .section { padding: 55px 0; }
 
-  /* Hero on mobile — uses header offset via var so it always clears it */
   .hero-section {
     min-height: auto;
     padding: calc(var(--header-height) + 1.5rem) 0 4rem;
@@ -3144,6 +3165,15 @@ body.lightbox-open {
   .pwa-install-text span { font-size: 0.7rem; }
   .pwa-install-btn { padding: 0.45rem 0.8rem; font-size: 0.75rem; }
   .pwa-install-close { width: 30px; height: 30px; font-size: 0.75rem; }
+
+  /* --- Mobile-friendly wave sizes --- */
+  .contact-wave {
+    height: 60%;
+  }
+  .contact-wave--1 { height: 70%; }
+  .contact-wave--2 { height: 55%; }
+  .contact-wave--3 { height: 65%; }
+  .contact-wave--4 { height: 50%; }
 }
 
 @media (max-width: 575.98px) {
@@ -3226,4 +3256,5 @@ body.lightbox-open {
   }
 
   .founder-photo-ring { animation: none; }
+  .contact-wave { animation: none !important; }
 }
