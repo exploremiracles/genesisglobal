@@ -11,7 +11,7 @@
    - Fonts / everything else — cache-first
 ============================================================ */
 
-const CACHE_VERSION = 'wol-v1.0.63';
+const CACHE_VERSION = 'wol-v1.0.65';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
