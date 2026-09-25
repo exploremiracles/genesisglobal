@@ -2233,25 +2233,46 @@ window.addEventListener('resize', () => {
 })();
 
 /* ============================================================
-   HERO VIDEO — robust autoplay + pause when tab hidden
+   HERO VIDEO — modern iOS autoplay with poster fallback
+   Handles iOS 26/27 stricter autoplay policies and Low Power Mode.
 ============================================================ */
 (function initHeroVideo() {
-  const video = document.querySelector('.hero-media-video');
+  const video = document.getElementById('heroVideo');
   if (!video) return;
 
   let hasStarted = false;
 
   const tryPlay = () => {
+    // Only try if metadata is ready to avoid unnecessary errors
+    if (video.readyState < 1) return;
+
     const p = video.play();
     if (p && typeof p.then === 'function') {
-      p.then(() => { hasStarted = true; }).catch(() => { /* still blocked */ });
+      p.then(() => {
+        hasStarted = true;
+        video.classList.add('is-playing');
+      }).catch((err) => {
+        // NotAllowedError = autoplay blocked (Low Power Mode, iOS policy)
+        // This is expected — the poster remains visible.
+        console.log('[Hero Video] Autoplay blocked:', err.name);
+      });
     } else {
       hasStarted = true;
     }
   };
 
-  tryPlay();
+  // Listen for metadata being ready — the ideal moment to start
+  video.addEventListener('loadedmetadata', tryPlay, { once: true });
 
+  // Also listen for 'suspend' which fires when exiting Low Power Mode
+  // or when network recovers, giving a second chance to play.
+  video.addEventListener('suspend', tryPlay);
+
+  // Also handle 'canplay' in case metadata fired earlier
+  video.addEventListener('canplay', tryPlay, { once: true });
+
+  // Retry on first user interaction (tap, click, scroll) — this is
+  // what iOS 27 requires if the initial autoplay attempt is rejected.
   const retryOnInteraction = () => {
     if (hasStarted && !video.paused) return;
     tryPlay();
@@ -2259,18 +2280,10 @@ window.addEventListener('resize', () => {
 
   const interactionEvents = ['touchstart', 'pointerdown', 'click', 'keydown', 'scroll'];
   interactionEvents.forEach(evt => {
-    window.addEventListener(evt, retryOnInteraction, { passive: true, once: false });
+    window.addEventListener(evt, retryOnInteraction, { passive: true });
   });
 
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) retryOnInteraction();
-      });
-    }, { threshold: 0.1 });
-    io.observe(video);
-  }
-
+  // Pause when tab hidden, resume when visible
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       video.pause();
@@ -2278,10 +2291,7 @@ window.addEventListener('resize', () => {
       tryPlay();
     }
   });
-
-  video.addEventListener('canplay', retryOnInteraction, { once: true });
 })();
-
 /* ============================================================
    FIRESTORE SUBSCRIPTIONS — fired together for parallel loading
 ============================================================ */
