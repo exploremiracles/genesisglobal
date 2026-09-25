@@ -2238,58 +2238,79 @@ window.addEventListener('resize', () => {
 ============================================================ */
 (function initHeroVideo() {
   const video = document.getElementById('heroVideo');
+
   if (!video) return;
 
   let hasStarted = false;
 
-  const tryPlay = () => {
-    // Only try if metadata is ready to avoid unnecessary errors
-    if (video.readyState < 1) return;
+  // Explicitly enforce the properties required for muted inline autoplay.
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
 
-    const p = video.play();
-    if (p && typeof p.then === 'function') {
-      p.then(() => {
-        hasStarted = true;
-        video.classList.add('is-playing');
-      }).catch((err) => {
-        // NotAllowedError = autoplay blocked (Low Power Mode, iOS policy)
-        // This is expected — the poster remains visible.
-        console.log('[Hero Video] Autoplay blocked:', err.name);
-      });
+  const tryPlay = () => {
+    if (document.hidden) return;
+    if (!video.paused) return;
+
+    const promise = video.play();
+
+    if (promise && typeof promise.then === 'function') {
+      promise
+        .then(() => {
+          hasStarted = true;
+          video.classList.add('is-playing');
+
+          console.log('[Hero Video] Playing');
+        })
+        .catch((err) => {
+          console.log(
+            '[Hero Video] Playback failed:',
+            err.name,
+            err.message
+          );
+        });
     } else {
       hasStarted = true;
+      video.classList.add('is-playing');
     }
   };
 
-  // Listen for metadata being ready — the ideal moment to start
-  video.addEventListener('loadedmetadata', tryPlay, { once: true });
+  // Try immediately.
+  tryPlay();
 
-  // Also listen for 'suspend' which fires when exiting Low Power Mode
-  // or when network recovers, giving a second chance to play.
-  video.addEventListener('suspend', tryPlay);
+  // Try when media becomes available.
+  video.addEventListener('loadeddata', tryPlay);
+  video.addEventListener('canplay', tryPlay);
 
-  // Also handle 'canplay' in case metadata fired earlier
-  video.addEventListener('canplay', tryPlay, { once: true });
-
-  // Retry on first user interaction (tap, click, scroll) — this is
-  // what iOS 27 requires if the initial autoplay attempt is rejected.
-  const retryOnInteraction = () => {
-    if (hasStarted && !video.paused) return;
-    tryPlay();
-  };
-
-  const interactionEvents = ['touchstart', 'pointerdown', 'click', 'keydown', 'scroll'];
-  interactionEvents.forEach(evt => {
-    window.addEventListener(evt, retryOnInteraction, { passive: true });
-  });
-
-  // Pause when tab hidden, resume when visible
+  // If the page becomes visible again.
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      video.pause();
-    } else {
+    if (!document.hidden) {
       tryPlay();
     }
+  });
+
+  // Fallback for browsers that reject autoplay initially.
+  const retryOnInteraction = () => {
+    if (hasStarted && !video.paused) return;
+
+    tryPlay();
+
+    window.removeEventListener('touchstart', retryOnInteraction);
+    window.removeEventListener('pointerdown', retryOnInteraction);
+  };
+
+  window.addEventListener('touchstart', retryOnInteraction, {
+    passive: true
+  });
+
+  window.addEventListener('pointerdown', retryOnInteraction, {
+    passive: true
+  });
+
+  // Useful diagnostics.
+  video.addEventListener('error', () => {
+    console.error('[Hero Video] Media error:', video.error);
+    console.error('[Hero Video] Current source:', video.currentSrc);
   });
 })();
 /* ============================================================
