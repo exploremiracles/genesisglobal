@@ -297,11 +297,11 @@ initCounters();
 ============================================================ */
 const facultyData = [
   { name: "Mrs. Zaira Hassan", role: "Chairperson", dept: "leadership", deptLabel: "Leadership", phone: "+919622222723" },
-  { name: "Sameer Hussain Mir", role: "Secretary", dept: "leadership", deptLabel: "Leadership", phone: "+917006261543" },
-  { name: "Ms. Asma Bashir", role: "Principal", dept: "leadership", deptLabel: "Leadership", phone: "+917006266499" },
+  { name: "Mr. Sameer Hussain Mir", role: "Secretary", dept: "leadership", deptLabel: "Leadership", phone: "+917006261543" },
+  { name: "Mrs. Asma Bashir", role: "Principal", dept: "leadership", deptLabel: "Leadership", phone: "+917006266499" },
   { name: "Mr. Ghulam Hassan Mir", role: "VP", dept: "leadership", deptLabel: "Leadership", phone: "+919906670378" },
-  { name: "Jabeena Mehdi", role: "AO", dept: "management", deptLabel: "Management", phone: "+919906852216" },
-  { name: "Ahtisham Hussain", role: "Transport Head", dept: "management", deptLabel: "Management", phone: "+916006020208" }
+  { name: "Mrs. Jabeena Mehdi", role: "AO", dept: "management", deptLabel: "Management", phone: "+919906852216" },
+  { name: "Mr. Ahtisham Hussain", role: "Transport Head", dept: "management", deptLabel: "Management", phone: "+916006020208" }
 ];
 
 const facultyGrid = document.getElementById('facultyGrid');
