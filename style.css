@@ -2609,74 +2609,9 @@ img { max-width: 100%; height: auto; }
    CONTACT — Animated wave background
 ============================================================ */
 .contact-section {
-  position: relative;
-  background: linear-gradient(180deg, #F8F7F2 0%, #EEF0F4 100%);
-  overflow: hidden;
-  isolation: isolate;
+  background: var(--ivory);
 }
 
-.contact-waves {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.contact-wave {
-  position: absolute;
-  bottom: -10%;
-  left: 0;
-  width: 200%;
-  height: 80%;
-  display: block;
-  will-change: transform;
-}
-
-.contact-wave--1 {
-  color: var(--gold);
-  animation: waveDrift 22s linear infinite;
-  bottom: -15%;
-  height: 90%;
-}
-
-.contact-wave--2 {
-  color: var(--crimson);
-  animation: waveDriftReverse 28s linear infinite;
-  bottom: -5%;
-  height: 75%;
-}
-
-.contact-wave--3 {
-  color: var(--navy);
-  animation: waveDrift 34s linear infinite;
-  bottom: -20%;
-  height: 85%;
-  animation-delay: -6s;
-}
-
-.contact-wave--4 {
-  color: #0a2570;
-  animation: waveDriftReverse 40s linear infinite;
-  bottom: 0;
-  height: 70%;
-  animation-delay: -12s;
-}
-
-@keyframes waveDrift {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-50%, 0, 0); }
-}
-
-@keyframes waveDriftReverse {
-  0%   { transform: translate3d(-50%, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-.contact-section .container {
-  position: relative;
-  z-index: 1;
-}
 
 .contact-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
 .contact-item i {
@@ -3157,15 +3092,6 @@ body.lightbox-open {
   .pwa-install-btn { padding: 0.45rem 0.8rem; font-size: 0.75rem; }
   .pwa-install-close { width: 30px; height: 30px; font-size: 0.75rem; }
 
-  /* --- Mobile-friendly wave sizes --- */
-  .contact-wave {
-    height: 60%;
-  }
-  .contact-wave--1 { height: 70%; }
-  .contact-wave--2 { height: 55%; }
-  .contact-wave--3 { height: 65%; }
-  .contact-wave--4 { height: 50%; }
-}
 
 @media (max-width: 575.98px) {
   .section { padding: 50px 0; }
