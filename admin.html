@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#011959" />
+  <title>Admin — Genesis Global Academy</title>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-96x96.png" />
+  <link rel="apple-touch-icon" href="icon-192x192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN SCREEN
+============================================================ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="logo1.png" alt="Genesis Global Academy" />
+    </div>
+    <h1 class="login-title">Genesis Admin</h1>
+    <p class="login-subtitle">Sign in to manage your school</p>
+
+    <form id="loginForm" class="login-form" novalidate>
+      <div class="login-field">
+        <label for="loginEmail">Email</label>
+        <input
+          type="email"
+          id="loginEmail"
+          name="email"
+          placeholder="admin@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="login-field">
+        <label for="loginPassword">Password</label>
+        <input
+          type="password"
+          id="loginPassword"
+          name="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <div id="loginError" class="login-error d-none"></div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span class="spinner-border spinner-border-sm d-none me-2" id="loginSpinner" role="status" aria-hidden="true"></span>
+        <span id="loginBtnText">Sign In</span>
+      </button>
+    </form>
+
+    <p class="login-footer">
+      <a href="index.html">← Back to website</a>
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN APP
+============================================================ -->
+<div id="adminApp" class="admin-app d-none">
+
+  <!-- TOP BAR -->
+  <header class="admin-topbar">
+    <div class="admin-topbar-inner">
+      <button class="admin-menu-btn" id="adminMenuBtn" aria-label="Toggle menu">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <a href="index.html" class="admin-brand" aria-label="Back to website">
+        <img src="logo1.png" alt="" class="admin-brand-logo" />
+        <div class="admin-brand-text">
+          <strong>Genesis Admin</strong>
+          <span>Manage everything</span>
+        </div>
+      </a>
+
+      <div class="admin-topbar-actions">
+        <span class="admin-user-email" id="adminUserEmail"></span>
+        <button class="admin-logout-btn" id="adminLogoutBtn" aria-label="Logout">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="admin-logout-text">Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR + MAIN -->
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <nav class="admin-nav">
+        <a href="#dashboard" class="admin-nav-item active" data-tab="dashboard">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#news" class="admin-nav-item" data-tab="news">
+          <i class="bi bi-newspaper"></i>
+          <span>News & Events</span>
+        </a>
+        <a href="#reviews" class="admin-nav-item" data-tab="reviews">
+          <i class="bi bi-star-fill"></i>
+          <span>Reviews</span>
+          <span class="admin-nav-badge d-none" id="pendingReviewsBadge">0</span>
+        </a>
+        <a href="#downloads" class="admin-nav-item" data-tab="downloads">
+          <i class="bi bi-cloud-arrow-down-fill"></i>
+          <span>Downloads</span>
+        </a>
+        <a href="#admissions" class="admin-nav-item" data-tab="admissions">
+          <i class="bi bi-mortarboard-fill"></i>
+          <span>Admissions</span>
+        </a>
+        <a href="#messages" class="admin-nav-item" data-tab="messages">
+          <i class="bi bi-envelope-fill"></i>
+          <span>Messages</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- SCRIM for mobile sidebar -->
+    <div class="admin-scrim" id="adminScrim"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+      <!-- ============================================
+           TAB: DASHBOARD
+      ============================================ -->
+      <section class="admin-tab active" data-tab-content="dashboard">
+        <div class="admin-tab-header">
+          <h2>Welcome back 👋</h2>
+          <p>Here's what's happening at Genesis Global Academy.</p>
+        </div>
+
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background: rgba(1, 25, 89, 0.1); color: var(--navy);">
+              <i class="bi bi-newspaper"></i>
+            </div>
+            <div class="admin-stat-body">
+              <span class="admin-stat-value" id="statNews">—</span>
+              <span class="admin-stat-label">News Posts</span>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background: rgba(199, 0, 55, 0.1); color: var(--crimson);">
+              <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="admin-stat-body">
+              <span class="admin-stat-value" id="statAdmissions">—</span>
+              <span class="admin-stat-label">Applications</span>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background: rgba(194, 183, 119, 0.15); color: #9a8b4a;">
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="admin-stat-body">
+              <span class="admin-stat-value" id="statReviews">—</span>
+              <span class="admin-stat-label">Reviews</span>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background: rgba(34, 197, 94, 0.12); color: #16A34A;">
+              <i class="bi bi-envelope-fill"></i>
+            </div>
+            <div class="admin-stat-body">
+              <span class="admin-stat-value" id="statMessages">—</span>
+              <span class="admin-stat-label">Messages</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-dashboard-row">
+          <div class="admin-card">
+            <h3 class="admin-card-title">
+              <i class="bi bi-activity me-2"></i>Recent Activity
+            </h3>
+            <div id="recentActivity" class="admin-activity-list">
+              <div class="admin-skeleton-line"></div>
+              <div class="admin-skeleton-line short"></div>
+              <div class="admin-skeleton-line"></div>
+              <div class="admin-skeleton-line short"></div>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <h3 class="admin-card-title">
+              <i class="bi bi-exclamation-circle me-2"></i>Needs Attention
+            </h3>
+            <div id="pendingItems" class="admin-pending-list">
+              <div class="admin-skeleton-line"></div>
+              <div class="admin-skeleton-line short"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3 class="admin-card-title">
+            <i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions
+          </h3>
+          <div class="admin-quick-actions">
+            <button class="admin-quick-btn" data-quick="add-news">
+              <i class="bi bi-plus-circle-fill"></i> Add News Post
+            </button>
+            <button class="admin-quick-btn" data-quick="add-download">
+              <i class="bi bi-plus-circle-fill"></i> Add Download
+            </button>
+            <button class="admin-quick-btn" data-quick="reviews">
+              <i class="bi bi-star-fill"></i> Review Pending
+            </button>
+            <button class="admin-quick-btn" data-quick="admissions">
+              <i class="bi bi-mortarboard-fill"></i> View Applications
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           TAB: NEWS
+      ============================================ -->
+      <section class="admin-tab" data-tab-content="news">
+        <div class="admin-tab-header admin-tab-header-flex">
+          <div>
+            <h2>News & Events</h2>
+            <p>Publish and manage announcements.</p>
+          </div>
+          <button class="admin-primary-btn" id="addNewsBtn">
+            <i class="bi bi-plus-lg"></i> Add News
+          </button>
+        </div>
+
+        <div class="admin-toolbar">
+          <div class="admin-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="newsSearch" placeholder="Search news..." />
+          </div>
+          <select id="newsFilter" class="admin-select">
+            <option value="all">All Categories</option>
+            <option value="News">News</option>
+            <option value="Event">Event</option>
+            <option value="Sports">Sports</option>
+            <option value="Academic">Academic</option>
+            <option value="Announcement">Announcement</option>
+          </select>
+        </div>
+
+        <div id="newsList" class="admin-list">
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+        </div>
+
+        <div id="newsEmpty" class="admin-empty d-none">
+          <i class="bi bi-newspaper"></i>
+          <p>No news posts yet. Click "Add News" to create one.</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           TAB: REVIEWS
+      ============================================ -->
+      <section class="admin-tab" data-tab-content="reviews">
+        <div class="admin-tab-header">
+          <h2>Reviews</h2>
+          <p>Approve or reject parent and student reviews.</p>
+        </div>
+
+        <div class="admin-filter-chips">
+          <button class="admin-chip active" data-review-filter="pending">
+            <i class="bi bi-clock"></i> Pending
+          </button>
+          <button class="admin-chip" data-review-filter="approved">
+            <i class="bi bi-check-circle-fill"></i> Approved
+          </button>
+          <button class="admin-chip" data-review-filter="all">
+            <i class="bi bi-list-ul"></i> All
+          </button>
+        </div>
+
+        <div id="reviewsList" class="admin-list">
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+        </div>
+
+        <div id="reviewsEmpty" class="admin-empty d-none">
+          <i class="bi bi-star"></i>
+          <p>No reviews in this filter.</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           TAB: DOWNLOADS
+      ============================================ -->
+      <section class="admin-tab" data-tab-content="downloads">
+        <div class="admin-tab-header admin-tab-header-flex">
+          <div>
+            <h2>Downloads Journal</h2>
+            <p>Manage study material, syllabus, and resources.</p>
+          </div>
+          <button class="admin-primary-btn" id="addDownloadBtn">
+            <i class="bi bi-plus-lg"></i> Add Resource
+          </button>
+        </div>
+
+        <div class="admin-toolbar">
+          <select id="downloadFilter" class="admin-select">
+            <option value="all">All Classes</option>
+            <option value="nursery">Nursery</option>
+            <option value="lkg">LKG</option>
+            <option value="ukg">UKG</option>
+            <option value="class1">Class 1</option>
+            <option value="class2">Class 2</option>
+            <option value="class3">Class 3</option>
+            <option value="class4">Class 4</option>
+            <option value="class5">Class 5</option>
+            <option value="class6">Class 6</option>
+            <option value="class7">Class 7</option>
+            <option value="class8">Class 8</option>
+            <option value="misc">Miscellaneous</option>
+          </select>
+        </div>
+
+        <div id="downloadsList" class="admin-list">
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+        </div>
+
+        <div id="downloadsEmpty" class="admin-empty d-none">
+          <i class="bi bi-cloud-arrow-down"></i>
+          <p>No resources yet. Click "Add Resource" to start.</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           TAB: ADMISSIONS
+      ============================================ -->
+      <section class="admin-tab" data-tab-content="admissions">
+        <div class="admin-tab-header">
+          <h2>Admissions</h2>
+          <p>Track and update admission applications.</p>
+        </div>
+
+        <div class="admin-filter-chips">
+          <button class="admin-chip active" data-admission-filter="all">
+            <i class="bi bi-list-ul"></i> All
+          </button>
+          <button class="admin-chip" data-admission-filter="1">
+            <i class="bi bi-inbox"></i> Received
+          </button>
+          <button class="admin-chip" data-admission-filter="2">
+            <i class="bi bi-clock-history"></i> Under Review
+          </button>
+          <button class="admin-chip" data-admission-filter="3">
+            <i class="bi bi-check-circle-fill"></i> Approved
+          </button>
+        </div>
+
+        <div class="admin-toolbar">
+          <div class="admin-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="admissionSearch" placeholder="Search by name, ID, or class..." />
+          </div>
+        </div>
+
+        <div id="admissionsList" class="admin-list">
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+        </div>
+
+        <div id="admissionsEmpty" class="admin-empty d-none">
+          <i class="bi bi-mortarboard"></i>
+          <p>No applications found.</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           TAB: MESSAGES
+      ============================================ -->
+      <section class="admin-tab" data-tab-content="messages">
+        <div class="admin-tab-header">
+          <h2>Contact Messages</h2>
+          <p>Read and reply to parent inquiries.</p>
+        </div>
+
+        <div class="admin-filter-chips">
+          <button class="admin-chip active" data-message-filter="all">
+            <i class="bi bi-list-ul"></i> All
+          </button>
+          <button class="admin-chip" data-message-filter="unread">
+            <i class="bi bi-envelope"></i> Unread
+          </button>
+          <button class="admin-chip" data-message-filter="read">
+            <i class="bi bi-envelope-open"></i> Read
+          </button>
+        </div>
+
+        <div id="messagesList" class="admin-list">
+          <div class="admin-skeleton-card"></div>
+          <div class="admin-skeleton-card"></div>
+        </div>
+
+        <div id="messagesEmpty" class="admin-empty d-none">
+          <i class="bi bi-envelope"></i>
+          <p>No messages found.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Generic (used by all forms)
+============================================================ -->
+<div class="admin-modal d-none" id="adminModal">
+  <div class="admin-modal-overlay" data-close-modal></div>
+  <div class="admin-modal-card">
+    <button class="admin-modal-close" data-close-modal aria-label="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="admin-modal-header">
+      <h3 id="adminModalTitle">Modal</h3>
+      <p id="adminModalSubtitle" class="admin-modal-subtitle"></p>
+    </div>
+    <div class="admin-modal-body" id="adminModalBody"></div>
+    <div class="admin-modal-footer" id="adminModalFooter"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONFIRM DIALOG
+============================================================ -->
+<div class="admin-confirm d-none" id="adminConfirm">
+  <div class="admin-confirm-overlay" data-close-confirm></div>
+  <div class="admin-confirm-card">
+    <div class="admin-confirm-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h3 id="adminConfirmTitle">Are you sure?</h3>
+    <p id="adminConfirmMessage">This action cannot be undone.</p>
+    <div class="admin-confirm-actions">
+      <button class="admin-btn admin-btn-ghost" data-close-confirm>Cancel</button>
+      <button class="admin-btn admin-btn-danger" id="adminConfirmOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+<div id="toastContainer" class="admin-toast-container" aria-live="polite"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>
