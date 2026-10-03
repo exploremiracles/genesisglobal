@@ -26,8 +26,8 @@ const APP_SHELL = [
   'logo1.png',
   'logo2.png',
   'logo3.png',
-  'bgvideo.webm',
-  'bgvideo.mp4',
+  'bgvideo2.webm',
+  'bgvideo2.mp4',
   'poster.jpg'
 ];
 
