@@ -3309,7 +3309,7 @@ body.lightbox-open {
    IPHONE SE & TINY PHONE HEADER — touch-safe buttons
    Width ≤ 380px OR height ≤ 700px
 ============================================================ */
-@media (max-width: 380px), (max-height: 700px) {
+@media (max-width: 480px) {
 
   /* Give the buttons guaranteed space, shrink the brand text */
   .site-header-inner {
