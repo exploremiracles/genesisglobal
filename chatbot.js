@@ -922,18 +922,45 @@ document.addEventListener('DOMContentLoaded', () => {
      Prevents the "chatbot ↔ index" ping-pong problem.
   ------------------------------------------------------- */
 
-/* ---------- Back Navigation ---------- */
+/* ---------- Back navigation (history-aware, with fade) ---------- */
 (function initBackNavigation() {
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
   const backLinks = document.querySelectorAll(
     'a[href="index.html"], .chat-back, a[href="./"], a[href="/"]'
   );
 
   backLinks.forEach(link => {
-    link.addEventListener('click', function (e) {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
 
-      // Always navigate directly to the index page.
-      window.location.replace('./index.html');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const goBack = () => {
+        const hasHistory = window.history.length > 1;
+
+        if (hasHistory) {
+          window.history.back();
+          return;
+        }
+
+        if (isStandalone) {
+          window.location.replace('index.html');
+        } else {
+          window.location.href = 'index.html';
+        }
+      };
+
+      if (reduced) {
+        goBack();
+        return;
+      }
+
+      // Fade out first, then navigate
+      document.body.classList.add('page-fading-out');
+      setTimeout(goBack, 300);
     });
   });
 })();
