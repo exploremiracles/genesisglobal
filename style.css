@@ -227,7 +227,7 @@ img { max-width: 100%; height: auto; }
 .site-header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -239,6 +239,114 @@ img { max-width: 100%; height: auto; }
   align-items: center;
   white-space: nowrap;
   touch-action: manipulation;
+}
+
+/* ============================================================
+   HEADER — Ask Genesis (AI) button
+============================================================ */
+.btn-ai-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  background: linear-gradient(135deg, var(--gold) 0%, #a89660 100%);
+  color: var(--navy);
+  border-radius: 50px;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 14px rgba(194, 183, 119, 0.4);
+  transition: all 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;              /* ← ADD THIS LINE */
+}
+
+/* Subtle shimmer on hover */
+.btn-ai-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transition: left 0.6s ease;
+}
+
+.btn-ai-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(194, 183, 119, 0.55);
+}
+
+.btn-ai-header:hover::after {
+  left: 100%;
+}
+
+.btn-ai-header:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn-ai-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--white);
+  padding: 2px;
+  object-fit: contain;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-ai-text {
+  line-height: 1;
+}
+
+/* When the header is in scrolled (light) mode, keep the button readable */
+.site-header.scrolled .btn-ai-header {
+  background: linear-gradient(135deg, var(--gold) 0%, #a89660 100%);
+  color: var(--navy);
+}
+
+/* ============================================================
+   HEADER AI — Mobile adjustments
+============================================================ */
+@media (max-width: 767.98px) {
+  .btn-ai-header {
+    padding: 0.4rem;
+    gap: 0;
+    min-width: 44px;         /* ensures a comfortable tap target */
+    min-height: 44px;
+    justify-content: center;
+  }
+  .btn-ai-text {
+    display: none;
+  }
+  .btn-ai-logo {
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+  }
+}
+
+/* Very small screens — keep the icon, tighten further */
+@media (max-width: 375.98px) {
+  .btn-ai-header {
+    padding: 0.3rem;
+  }
+  .btn-ai-logo {
+    width: 26px;
+    height: 26px;
+  }
 }
 
 /* ============================================================
@@ -432,6 +540,8 @@ img { max-width: 100%; height: auto; }
     );
   box-shadow: inset 0 0 180px 40px rgba(1, 25, 89, 0.35);
 }
+
+
 
 .hero-content {
   position: relative;
@@ -2606,7 +2716,7 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   CONTACT — Animated wave background
+   CONTACT
 ============================================================ */
 .contact-section {
   background: var(--ivory);
@@ -2968,10 +3078,27 @@ body.lightbox-open {
   .site-header-logo { height: 36px; }
   .site-header-title { font-size: 0.95rem; }
   .site-header-subtitle { font-size: 0.62rem; }
-  .btn-header-cta { padding: 0.45rem 0.9rem; font-size: 0.78rem; }
-  .btn-header-cta-text { display: none; }
-  .btn-header-cta i { margin-right: 0 !important; font-size: 1rem; }
+  
+  .site-header-actions {
+  gap: 0.85rem;
+}
 
+.btn-header-cta {
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  touch-action: manipulation;
+  z-index: 1;
+}
+.btn-header-cta-text {
+  display: none;
+}
+.btn-header-cta i {
+  margin-right: 0 !important;
+  font-size: 1rem;
+}
   .section { padding: 55px 0; }
 
   .hero-section {
@@ -3091,7 +3218,9 @@ body.lightbox-open {
   .pwa-install-text span { font-size: 0.7rem; }
   .pwa-install-btn { padding: 0.45rem 0.8rem; font-size: 0.75rem; }
   .pwa-install-close { width: 30px; height: 30px; font-size: 0.75rem; }
-
+}
+  /* --- Mobile-friendly wave sizes --- */
+  
 
 @media (max-width: 575.98px) {
   .section { padding: 50px 0; }
@@ -3173,5 +3302,204 @@ body.lightbox-open {
   }
 
   .founder-photo-ring { animation: none; }
-  .contact-wave { animation: none !important; }
+  
+}
+/* ============================================================
+   NAV TRANSITION — simple, reliable version
+============================================================ */
+.nav-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 200000;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(194, 183, 119, 0.14) 0%, transparent 55%),
+    linear-gradient(135deg, #010F38 0%, #011959 50%, #041a4a 100%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.nav-transition.active {
+  display: flex;
+  opacity: 1;
+}
+
+.nav-transition-inner {
+  text-align: center;
+  padding: 0 1.5rem;
+  max-width: 700px;
+}
+
+.nav-transition-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 5.5vw, 2.8rem);
+  font-weight: 700;
+  color: #E8DFA8;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+  text-shadow:
+    0 0 20px rgba(194, 183, 119, 0.55),
+    0 0 40px rgba(194, 183, 119, 0.3);
+}
+
+.nav-transition-line {
+  width: 200px;
+  height: 2px;
+  margin: 1rem auto 0.85rem;
+  background: linear-gradient(90deg,
+    transparent, var(--gold), var(--crimson), var(--gold), transparent);
+  border-radius: 2px;
+}
+
+.nav-transition-sub {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.9;
+}
+
+  /* ============================================================
+   IPHONE SE & TINY PHONE HEADER — touch-safe buttons
+   Width ≤ 380px OR height ≤ 700px
+============================================================ */
+@media (max-width: 380px), (max-height: 700px) {
+
+  /* Give the buttons guaranteed space, shrink the brand text */
+  .site-header-inner {
+    padding: 0 0.5rem;
+    gap: 0.4rem;
+  }
+
+  /* Brand shrinks so actions have room */
+  .site-header-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    gap: 0.5rem;
+  }
+
+  .site-header-logo {
+    height: 32px;
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .site-header-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .site-header-title {
+    font-size: 0.82rem;
+    letter-spacing: -0.2px;
+  }
+
+  .site-header-subtitle {
+    font-size: 0.55rem;
+    letter-spacing: 0.8px;
+  }
+
+  /* Actions never shrink, always horizontal */
+  .site-header-actions {
+    flex-shrink: 0;
+    gap: 0.4rem;              /* tighter but still separated */
+    display: flex;
+    align-items: center;
+  }
+
+  /* AI button — strong tap target, isolated stacking */
+  .btn-ai-header {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 10;               /* ABOVE the Apply button */
+    pointer-events: auto;
+    isolation: isolate;        /* own stacking context */
+    border-radius: 50%;
+  }
+
+  .btn-ai-text {
+    display: none;
+  }
+
+  .btn-ai-logo {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;      /* clicks pass through to the anchor */
+  }
+
+  /* Apply button — strong tap target, below the AI button */
+  .btn-header-cta {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+  }
+
+  .btn-header-cta-text {
+    display: none;
+  }
+
+  .btn-header-cta i {
+    margin: 0 !important;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+}
+
+/* ============================================================
+   ULTRA-NARROW HEADER — 320px wide devices (iPhone SE 1st gen)
+============================================================ */
+@media (max-width: 340px) {
+  .site-header-title {
+    font-size: 0.75rem;
+  }
+
+  .site-header-subtitle {
+    display: none;             /* hide subtitle on very narrow */
+  }
+
+  .site-header-logo {
+    height: 28px;
+    width: 28px;
+  }
+
+  .site-header-actions {
+    gap: 0.3rem;
+  }
+
+  .btn-ai-header,
+  .btn-header-cta {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .btn-ai-logo {
+    width: 24px;
+    height: 24px;
+  }
 }
