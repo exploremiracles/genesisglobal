@@ -2335,13 +2335,34 @@ window.addEventListener('resize', () => {
     console.error('[Hero Video] Current source:', video.currentSrc);
   });
 })();
-
-
-
 /* ============================================================
-   PAGE FADE — click "Ask Genesis" → fade out → navigate
+   PAGE FADE — safe version with bfcache support
 ============================================================ */
 (function initPageFade() {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 1. On first load, fade the page IN
+  if (!reduced) {
+    // Only fade in if the browser is NOT restoring from bfcache
+    // and this is a fresh navigation.
+    const isFreshLoad = !performance.getEntriesByType('navigation')[0]?.type ||
+                        performance.getEntriesByType('navigation')[0]?.type !== 'back_forward';
+
+    if (isFreshLoad) {
+      document.body.classList.add('page-fade-in');
+      document.body.addEventListener('animationend', () => {
+        document.body.classList.remove('page-fade-in');
+      }, { once: true });
+    }
+  }
+
+  // 2. When bfcache restores the page, force body to be fully visible
+  window.addEventListener('pageshow', (event) => {
+    document.body.classList.remove('page-fade-in', 'page-fading-out');
+    document.body.style.opacity = '1';
+  });
+
+  // 3. Fade out when clicking "Ask Genesis"
   const links = document.querySelectorAll(
     'a[href="chatbot.html"], .btn-ai-header, .floating-chat-btn'
   );
@@ -2350,19 +2371,18 @@ window.addEventListener('resize', () => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
       if (!href) return;
-
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced) return; // default navigation, no fade
+      if (reduced) return;
 
       e.preventDefault();
       document.body.classList.add('page-fading-out');
 
       setTimeout(() => {
         window.location.href = href;
-      }, 300); // matches the CSS fade-out duration
+      }, 300);
     });
   });
 })();
+
 
 
 
