@@ -987,6 +987,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 })();
+   
+   greet();
+});
 
 /* ============================================================
    GREETING
