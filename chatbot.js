@@ -918,15 +918,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ---------- Back navigation (history-aware) ----------
-     Prevents the "chatbot ↔ index" ping-pong problem.
-  ------------------------------------------------------- */
+  /* ============================================================
+   PAGE FADE — chatbot side (fade-in on load, fade-out on back)
+============================================================ */
+(function initPageFade() {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- Back navigation (history-aware, with fade) ---------- */
+  // 1. On first load, fade the page IN
+  if (!reduced) {
+    const isFreshLoad = !performance.getEntriesByType('navigation')[0]?.type ||
+                        performance.getEntriesByType('navigation')[0]?.type !== 'back_forward';
+
+    if (isFreshLoad) {
+      document.body.classList.add('page-fade-in');
+      document.body.addEventListener('animationend', () => {
+        document.body.classList.remove('page-fade-in');
+      }, { once: true });
+    }
+  }
+
+  // 2. When bfcache restores the page, force body visible
+  window.addEventListener('pageshow', () => {
+    document.body.classList.remove('page-fade-in', 'page-fading-out');
+    document.body.style.opacity = '1';
+  });
+})();
+
+/* ============================================================
+   BACK NAVIGATION — history-aware with fade
+============================================================ */
 (function initBackNavigation() {
   const isStandalone =
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const backLinks = document.querySelectorAll(
     'a[href="index.html"], .chat-back, a[href="./"], a[href="/"]'
@@ -935,8 +961,6 @@ document.addEventListener('DOMContentLoaded', () => {
   backLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       const goBack = () => {
         const hasHistory = window.history.length > 1;
@@ -958,15 +982,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Fade out first, then navigate
       document.body.classList.add('page-fading-out');
       setTimeout(goBack, 300);
     });
   });
 })();
-
-        
-
 
 /* ============================================================
    GREETING
