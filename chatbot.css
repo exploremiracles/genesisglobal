@@ -1821,9 +1821,14 @@ input, textarea { font-family: inherit; }
   .chat-status-dot { animation: none !important; }
 }
 /* ============================================================
-   PAGE FADE — fade in on chatbot load
+   PAGE FADE — safe version for bfcache
 ============================================================ */
 body {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+body.page-fade-in {
   opacity: 0;
   animation: pageFadeIn 0.35s ease forwards;
 }
@@ -1833,19 +1838,16 @@ body {
   to   { opacity: 1; }
 }
 
-/* When navigating away — fade out */
 body.page-fading-out {
-  animation: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  opacity: 0 !important;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   body,
+  body.page-fade-in,
   body.page-fading-out {
-    opacity: 1;
-    animation: none;
-    transition: none;
+    opacity: 1 !important;
+    animation: none !important;
   }
 }
