@@ -296,12 +296,12 @@ initCounters();
    FACULTY DIRECTORY
 ============================================================ */
 const facultyData = [
-  { name: "Mrs. Zaira Hassan", role: "Chairperson", dept: "leadership", deptLabel: "Leadership", phone: "+919622222723" },
-  { name: "Mr. Sameer Hussain Mir", role: "Secretary", dept: "leadership", deptLabel: "Leadership", phone: "+917006261543" },
-  { name: "Mrs. Asma Bashir", role: "Principal", dept: "leadership", deptLabel: "Leadership", phone: "+917006266499" },
+  { name: "Muntazir Mehdi", role: "Chairperson", dept: "leadership", deptLabel: "Leadership", phone: "+919622222723" },
+  { name: "Sameer Hussain Mir", role: "Secretary", dept: "leadership", deptLabel: "Leadership", phone: "+917006261543" },
+  { name: "Ms. Asma Bashir", role: "Principal", dept: "leadership", deptLabel: "Leadership", phone: "+917006266499" },
   { name: "Mr. Ghulam Hassan Mir", role: "VP", dept: "leadership", deptLabel: "Leadership", phone: "+919906670378" },
-  { name: "Mrs. Jabeena Mehdi", role: "AO", dept: "management", deptLabel: "Management", phone: "+919906852216" },
-  { name: "Mr. Ahtisham Hussain", role: "Transport Head", dept: "management", deptLabel: "Management", phone: "+916006020208" }
+  { name: "Jabeena Mehdi", role: "AO", dept: "management", deptLabel: "Management", phone: "+919906852216" },
+  { name: "Ahtisham Hussain", role: "Transport Head", dept: "management", deptLabel: "Management", phone: "+916006020208" }
 ];
 
 const facultyGrid = document.getElementById('facultyGrid');
@@ -1654,16 +1654,38 @@ admissionForm.addEventListener('submit', async (e) => {
 
   try {
     const docRef = await db.collection('admissions').add(formData);
-    console.log('✅ Admission submitted:', docRef.id);
+console.log('✅ Admission submitted:', docRef.id);
 
-    document.getElementById('refId').textContent = 'ADM-' + docRef.id.slice(-8).toUpperCase();
-    document.getElementById('refDate').textContent = new Date().toLocaleDateString('en-IN', {
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+const refId = 'GGA-' + docRef.id.slice(-8).toUpperCase();
+const refDateStr = new Date().toLocaleDateString('en-IN', {
+  year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+});
 
-    admissionForm.classList.add('d-none');
-    successMessage.classList.remove('d-none');
-    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+document.getElementById('refId').textContent = refId;
+document.getElementById('refDate').textContent = refDateStr;
+
+// ---------------------------------------------------------
+// Write a slim lookup doc so the chatbot's status check
+// (Genesis AI) can serve it without needing read access to
+// the full admissions collection.
+// ---------------------------------------------------------
+try {
+  await db.collection('admission_lookups').doc(refId).set({
+    studentName: formData.studentName,
+    applyingClass: formData.applyingClass,
+    academicSession: formData.academicSession,
+    status: 1,
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  console.log('✅ Admission lookup doc created:', refId);
+} catch (lookupErr) {
+  // Non-fatal — the main submission already succeeded
+  console.warn('Lookup doc write failed (non-fatal):', lookupErr);
+}
+
+admissionForm.classList.add('d-none');
+successMessage.classList.remove('d-none');
+successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (error) {
     console.error('Admission submission error:', error);
     let msg = 'Something went wrong. Please try again later.';
@@ -2313,6 +2335,68 @@ window.addEventListener('resize', () => {
     console.error('[Hero Video] Current source:', video.currentSrc);
   });
 })();
+
+/* ============================================================
+   NAV TRANSITION — show school name overlay before navigating
+   Uses location.replace() in installed PWA mode so the chatbot
+   REPLACES index.html in the history stack. This prevents the
+   back-button ping-pong on Android/iOS home-screen apps.
+   In a normal browser tab, uses location.href (push) so the
+   browser back button still returns to index.html.
+============================================================ */
+(function initNavTransition() {
+  const overlay = document.getElementById('navTransition');
+  if (!overlay) return;
+
+  const links = document.querySelectorAll(
+    'a[href="chatbot.html"], .btn-ai-header, .floating-chat-btn'
+  );
+
+  // Detect if we're running as an installed PWA (standalone mode).
+  // Android: display-mode: standalone
+  // iOS Safari: navigator.standalone (legacy but still works)
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Helper: navigate using the right method for the context
+      const navigate = () => {
+        if (isStandalone) {
+          // PWA: replace — no history growth, back exits cleanly
+          window.location.replace(href);
+        } else {
+          // Browser: push — back returns to index.html as expected
+          window.location.href = href;
+        }
+      };
+
+      // Reduced motion: skip animation, navigate immediately
+      if (reduced) {
+        e.preventDefault();
+        navigate();
+        return;
+      }
+
+      // Full experience: show overlay, animate, then navigate
+      e.preventDefault();
+      overlay.classList.add('active');
+
+      setTimeout(() => {
+        navigate();
+      }, 2000);
+    });
+  });
+})();
+
+
+
 /* ============================================================
    FIRESTORE SUBSCRIPTIONS — fired together for parallel loading
 ============================================================ */
