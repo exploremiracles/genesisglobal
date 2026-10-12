@@ -3304,64 +3304,6 @@ body.lightbox-open {
   .founder-photo-ring { animation: none; }
   
 }
-/* ============================================================
-   NAV TRANSITION — simple, reliable version
-============================================================ */
-.nav-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 200000;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(194, 183, 119, 0.14) 0%, transparent 55%),
-    linear-gradient(135deg, #010F38 0%, #011959 50%, #041a4a 100%);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.nav-transition.active {
-  display: flex;
-  opacity: 1;
-}
-
-.nav-transition-inner {
-  text-align: center;
-  padding: 0 1.5rem;
-  max-width: 700px;
-}
-
-.nav-transition-title {
-  font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 5.5vw, 2.8rem);
-  font-weight: 700;
-  color: #E8DFA8;
-  letter-spacing: 0.5px;
-  line-height: 1.15;
-  text-shadow:
-    0 0 20px rgba(194, 183, 119, 0.55),
-    0 0 40px rgba(194, 183, 119, 0.3);
-}
-
-.nav-transition-line {
-  width: 200px;
-  height: 2px;
-  margin: 1rem auto 0.85rem;
-  background: linear-gradient(90deg,
-    transparent, var(--gold), var(--crimson), var(--gold), transparent);
-  border-radius: 2px;
-}
-
-.nav-transition-sub {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.9;
-}
 
   /* ============================================================
    IPHONE SE & TINY PHONE HEADER — touch-safe buttons
@@ -3501,5 +3443,36 @@ body.lightbox-open {
   .btn-ai-logo {
     width: 24px;
     height: 24px;
+  }
+}
+
+/* ============================================================
+   PAGE FADE — simple, quiet fade on navigation
+   No overlay, no text — just a smooth opacity transition.
+============================================================ */
+body {
+  opacity: 0;
+  animation: pageFadeIn 0.35s ease forwards;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* When navigating away — fade out */
+body.page-fading-out {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  body.page-fading-out {
+    opacity: 1;
+    animation: none;
+    transition: none;
   }
 }
