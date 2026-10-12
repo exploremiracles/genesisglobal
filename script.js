@@ -2336,28 +2336,15 @@ window.addEventListener('resize', () => {
   });
 })();
 
-/* ============================================================
-   NAV TRANSITION — show school name overlay before navigating
-   Uses location.replace() in installed PWA mode so the chatbot
-   REPLACES index.html in the history stack. This prevents the
-   back-button ping-pong on Android/iOS home-screen apps.
-   In a normal browser tab, uses location.href (push) so the
-   browser back button still returns to index.html.
-============================================================ */
-(function initNavTransition() {
-  const overlay = document.getElementById('navTransition');
-  if (!overlay) return;
 
+
+/* ============================================================
+   PAGE FADE — click "Ask Genesis" → fade out → navigate
+============================================================ */
+(function initPageFade() {
   const links = document.querySelectorAll(
     'a[href="chatbot.html"], .btn-ai-header, .floating-chat-btn'
   );
-
-  // Detect if we're running as an installed PWA (standalone mode).
-  // Android: display-mode: standalone
-  // iOS Safari: navigator.standalone (legacy but still works)
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
 
   links.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -2365,32 +2352,14 @@ window.addEventListener('resize', () => {
       if (!href) return;
 
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) return; // default navigation, no fade
 
-      // Helper: navigate using the right method for the context
-      const navigate = () => {
-        if (isStandalone) {
-          // PWA: replace — no history growth, back exits cleanly
-          window.location.replace(href);
-        } else {
-          // Browser: push — back returns to index.html as expected
-          window.location.href = href;
-        }
-      };
-
-      // Reduced motion: skip animation, navigate immediately
-      if (reduced) {
-        e.preventDefault();
-        navigate();
-        return;
-      }
-
-      // Full experience: show overlay, animate, then navigate
       e.preventDefault();
-      overlay.classList.add('active');
+      document.body.classList.add('page-fading-out');
 
       setTimeout(() => {
-        navigate();
-      }, 2000);
+        window.location.href = href;
+      }, 300); // matches the CSS fade-out duration
     });
   });
 })();
