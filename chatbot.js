@@ -921,43 +921,25 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Back navigation (history-aware) ----------
      Prevents the "chatbot ↔ index" ping-pong problem.
   ------------------------------------------------------- */
-  (function initBackNavigation() {
-    const isStandalone =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true;
 
-    const backLinks = document.querySelectorAll(
-      'a[href="index.html"], .chat-back, a[href="./"], a[href="/"]'
-    );
+/* ---------- Back Navigation ---------- */
+(function initBackNavigation() {
+  const backLinks = document.querySelectorAll(
+    'a[href="index.html"], .chat-back, a[href="./"], a[href="/"]'
+  );
 
-    backLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
+  backLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
 
-        const hasHistory = window.history.length > 1;
-
-        // Prefer history.back() so the chatbot entry is popped
-        // cleanly from the stack. Works in both browser and PWA.
-        if (hasHistory) {
-          window.history.back();
-          return;
-        }
-
-        // No history (fresh PWA launch from shortcut):
-        // use replace() so index.html replaces chatbot.html
-        // in the stack — back button then exits the app.
-        if (isStandalone) {
-          window.location.replace('index.html');
-        } else {
-          window.location.href = 'index.html';
-        }
-      });
+      // Always navigate directly to the index page.
+      window.location.replace('./index.html');
     });
-  })();
+  });
+})();
 
-  /* ---------- Greeting (last) ---------- */
-  greet();
-});
+        
+
 
 /* ============================================================
    GREETING
