@@ -1,0 +1,25 @@
+# ============================================================
+# Genesis Global Academy — robots.txt
+# ============================================================
+
+User-agent: *
+Allow: /
+
+# Block admin panel from search engines
+Disallow: /admin.html
+Disallow: /admin.css
+Disallow: /admin.js
+
+# Block legacy ADM- lookup paths (not real pages, just in case)
+Disallow: /admission_lookups/
+
+# Allow everyone to access the important pages
+Allow: /index.html
+Allow: /chatbot.html
+Allow: /style.css
+Allow: /script.js
+Allow: /chatbot.css
+Allow: /chatbot.js
+
+# Sitemap location
+Sitemap: https://genesisglobalacademy.org/sitemap.xml
