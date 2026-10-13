@@ -9,6 +9,7 @@ Allow: /
 Disallow: /admin.html
 Disallow: /admin.css
 Disallow: /admin.js
+Disallow: /admin-manifest.json
 
 # Block legacy ADM- lookup paths (not real pages, just in case)
 Disallow: /admission_lookups/
