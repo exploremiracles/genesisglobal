@@ -9,9 +9,10 @@
    - HTML navigation — network-first with offline.html fallback
    - JS / CSS / JSON — network-first (so updates land promptly)
    - Fonts / everything else — cache-first
+   - Admin panel (/admin*) — bypass SW (always fresh, never cached)
 ============================================================ */
 
-const CACHE_VERSION = 'wol-v1.0.97';
+const CACHE_VERSION = 'wol-v1.0.98';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -81,6 +82,23 @@ self.addEventListener('fetch', (event) => {
 
   // Ignore browser extension URLs
   if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') return;
+
+  // ============================================================
+  // ADMIN PANEL BYPASS — always fetch fresh, never cache.
+  // Admin must never be served from SW cache because:
+  //   1. It contains sensitive data (admissions, messages)
+  //   2. It must always load the latest code
+  //   3. It uses its own admin-manifest.json
+  // ============================================================
+  if (
+    url.pathname === '/admin.html' ||
+    url.pathname === '/admin.css' ||
+    url.pathname === '/admin.js' ||
+    url.pathname === '/admin-manifest.json' ||
+    url.pathname.startsWith('/admin')
+  ) {
+    return; // no event.respondWith() → browser fetches normally
+  }
 
   // ---- Firestore / Realtime DB — let the browser handle these directly.
   // The Firebase SDK has its own IndexedDB cache and offline layer.
