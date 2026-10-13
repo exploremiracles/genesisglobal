@@ -1,0 +1,57 @@
+{
+  "name": "Genesis Admin Panel",
+  "short_name": "GGA Admin",
+  "description": "Manage Genesis Global Academy — news, reviews, admissions, and more.",
+  "start_url": "/admin.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#011959",
+  "theme_color": "#011959",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "News & Events",
+      "short_name": "News",
+      "description": "Manage news posts",
+      "url": "/admin.html#news",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Admissions",
+      "short_name": "Admissions",
+      "description": "View applications",
+      "url": "/admin.html#admissions",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Reviews",
+      "short_name": "Reviews",
+      "description": "Approve pending reviews",
+      "url": "/admin.html#reviews",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
