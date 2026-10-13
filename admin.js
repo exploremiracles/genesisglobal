@@ -1,9 +1,8 @@
 /* ============================================================
-   GENESIS ADMIN — Logic
+   GENESIS ADMIN — Logic (with PWA support)
 ============================================================ */
 
-/* Firebase Config (same as main site) */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+/* Firebase Config */
 const firebaseConfig = {
   apiKey: "AIzaSyDHCpn9yfi7jgYrAMu2q1DLXVm9hjJNBxo",
   authDomain: "genesiskashmir.firebaseapp.com",
@@ -22,10 +21,43 @@ const auth = firebase.auth();
 /* The only email allowed to use this admin panel */
 const ADMIN_EMAIL = "exploremiracles2017@gmail.com";
 
+/* Force LOCAL auth persistence so admin stays signed in across PWA launches */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => console.log('🔥 Admin: Auth persistence = LOCAL'))
+  .catch((err) => console.warn('Auth persistence failed:', err));
+
 /* Enable offline persistence */
 db.enablePersistence({ synchronizeTabs: true })
   .then(() => console.log('🔥 Admin: Firestore + persistence'))
-  .catch(() => console.log('🔥 Admin: Firestore'));
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('🔥 Admin: persistence unavailable (multiple tabs)');
+    } else if (err.code === 'unimplemented') {
+      console.warn('🔥 Admin: persistence not supported');
+    } else {
+      console.warn('🔥 Admin: persistence error', err);
+    }
+  });
+
+/* ============================================================
+   PWA — Service Worker Registration
+============================================================ */
+(function initAdminPWA() {
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      console.log('[Admin PWA] SW registered:', reg.scope);
+
+      setInterval(() => {
+        reg.update().catch(() => {});
+      }, 60 * 60 * 1000);
+    } catch (err) {
+      console.warn('[Admin PWA] SW registration failed:', err);
+    }
+  });
+})();
 
 /* ============================================================
    STATE
@@ -33,13 +65,11 @@ db.enablePersistence({ synchronizeTabs: true })
 const state = {
   user: null,
   currentTab: 'dashboard',
-  // Cached data
   news: [],
   reviews: [],
   downloads: [],
   admissions: [],
   messages: [],
-  // Filters
   reviewFilter: 'pending',
   admissionFilter: 'all',
   messageFilter: 'all',
@@ -213,6 +243,8 @@ loginForm.addEventListener('submit', async (e) => {
     else if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
     else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
     else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+    else if (err.code === 'auth/invalid-credential') msg = 'Incorrect email or password.';
+    else if (err.code === 'auth/requests-from-referer-are-blocked') msg = 'This domain is not authorized. Contact support.';
     else if (err.message === 'not-authorized') msg = 'This account is not authorized to access the admin panel.';
 
     loginError.textContent = msg;
@@ -266,14 +298,11 @@ function switchTab(tabId) {
     tab.classList.toggle('active', tab.dataset.tabContent === tabId);
   });
 
-  // Close mobile sidebar
   document.getElementById('adminSidebar').classList.remove('open');
   document.getElementById('adminScrim').classList.remove('open');
 
-  // Update URL hash
   history.replaceState(null, '', `#${tabId}`);
 
-  // Load data for the tab (lazy)
   loadTabData(tabId);
 }
 
@@ -284,7 +313,6 @@ document.querySelectorAll('.admin-nav-item').forEach(item => {
   });
 });
 
-/* Mobile menu toggle */
 document.getElementById('adminMenuBtn').addEventListener('click', () => {
   document.getElementById('adminSidebar').classList.toggle('open');
   document.getElementById('adminScrim').classList.toggle('open');
@@ -295,7 +323,6 @@ document.getElementById('adminScrim').addEventListener('click', () => {
   document.getElementById('adminScrim').classList.remove('open');
 });
 
-/* Handle URL hash on load */
 window.addEventListener('hashchange', () => {
   const hash = window.location.hash.replace('#', '');
   if (hash && document.querySelector(`[data-tab-content="${hash}"]`)) {
@@ -320,7 +347,6 @@ async function loadDashboard() {
     document.getElementById('statReviews').textContent = reviewsSnap.size;
     document.getElementById('statMessages').textContent = messagesSnap.size;
 
-    // Recent activity: latest 5 across all collections
     const activity = [];
     newsSnap.forEach(d => {
       const data = d.data();
@@ -380,7 +406,6 @@ async function loadDashboard() {
       `).join('');
     }
 
-    // Pending reviews count
     let pendingCount = 0;
     reviewsSnap.forEach(d => { if (d.data().approved !== true) pendingCount++; });
 
@@ -427,8 +452,14 @@ async function loadDashboard() {
       });
     }
   } catch (err) {
-    console.error('Dashboard error:', err);
-    showToast('Failed to load dashboard', 'error');
+    console.error('Dashboard error:', err.code, err.message);
+    if (err.code === 'permission-denied') {
+      showToast('Not signed in or not authorized', 'error');
+    } else if (err.code === 'unavailable') {
+      showToast('Network unavailable — check connection', 'error');
+    } else {
+      showToast('Failed to load dashboard', 'error');
+    }
   }
 }
 
@@ -447,18 +478,13 @@ document.querySelectorAll('[data-quick]').forEach(btn => {
    NEWS
 ============================================================ */
 async function loadNews() {
-  const listEl = document.getElementById('newsList');
-  const emptyEl = document.getElementById('newsEmpty');
-
   try {
     const snap = await db.collection('news').orderBy('order', 'asc').get();
     state.news = [];
     snap.forEach(d => state.news.push({ _id: d.id, ...d.data() }));
-
     renderNewsList();
   } catch (err) {
     console.error('News load error:', err);
-    // Fallback without order
     try {
       const snap = await db.collection('news').get();
       state.news = [];
@@ -676,12 +702,10 @@ async function loadReviews() {
     const snap = await db.collection('reviews').orderBy('createdAt', 'desc').get();
     state.reviews = [];
     snap.forEach(d => state.reviews.push({ _id: d.id, ...d.data() }));
-
     updatePendingReviewsBadge();
     renderReviewsList();
   } catch (err) {
     console.error('Reviews load error:', err);
-    // Fallback
     try {
       const snap = await db.collection('reviews').get();
       state.reviews = [];
@@ -1212,10 +1236,8 @@ async function updateAdmissionStatus(id, refId) {
   btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Updating...`;
 
   try {
-    // Update the main admission doc
     await db.collection('admissions').doc(id).update({ status: newStatus });
 
-    // Try to update the lookup doc too (so the chatbot sees the new status)
     try {
       await db.collection('admission_lookups').doc(refId).update({ status: newStatus });
     } catch (lookupErr) {
@@ -1354,10 +1376,7 @@ function deleteMessage(id) {
 let loadedTabs = {};
 
 function loadTabData(tabId) {
-  // Always reload dashboard stats
   if (tabId === 'dashboard') { loadDashboard(); return; }
-
-  // Cache per tab so we don't re-fetch unnecessarily
   if (loadedTabs[tabId]) return;
   loadedTabs[tabId] = true;
 
@@ -1374,23 +1393,20 @@ function loadTabData(tabId) {
 function initAdmin() {
   loadedTabs = {};
 
-  // Pick initial tab from URL hash
   const hash = window.location.hash.replace('#', '');
   const initialTab = hash && document.querySelector(`[data-tab-content="${hash}"]`)
     ? hash : 'dashboard';
 
   switchTab(initialTab);
 
-  // Load dashboard always
   loadDashboard();
-  loadReviews();       // needed for pending badge
+  loadReviews();
 }
 
 /* ============================================================
    KEYBOARD SHORTCUTS
 ============================================================ */
 document.addEventListener('keydown', (e) => {
-  // Esc closes modal / confirm
   if (e.key === 'Escape') {
     if (!document.getElementById('adminConfirm').classList.contains('d-none')) {
       closeConfirm();
